@@ -1,0 +1,186 @@
+\documentclass[oneside,11pt,letter]{article}
+
+% General include (DO NOT MODIFY)
+\include{cs446include}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%CHANGE
+%.   to booklet to print the problems only
+%
+%    to both to print problems and solutions
+%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\type}{booklet}
+%\newcommand{\type}{both}
+
+% Custom adjustments (CHANGE THIS FILE FOR ADDITIONAL ADJUSTMENTS)
+\include{cs446custom}
+
+%************************************************************************
+%                                                                       *
+%            End of preamble and beginning of text.                     *
+%                                                                       *
+%************************************************************************
+
+\begin{document}
+%------------------------- Title Page ----------------------------------
+\thispagestyle{empty}
+\baselineskip2.5ex
+{\bf University of Illinois}
+\hfill
+Spring 2018
+
+{\Large
+\begin{center}
+{\sf CS\,446: Machine Learning}\\ Homework 1\\
+\end{center}
+}
+{\large
+\begin{center}
+{\color{red}Due on Tuesday, January 23, 2018, 11:59 a.m. Central Time}
+\end{center}
+}
+
+
+
+\ifthenelse{\equal{\type}{booklet}}{
+\input{HW1_StudentSolution} %The students have to fill this file to print the solution
+}{
+\input{HW1_OurSolution} %This file will not be provided to students since it contains the solution
+}
+
+\begin{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%  BEGINNING OF PROBLEMS LIST
+% Problem Explanation:
+% - first argument is the number of points
+% - second argument is the title and the text
+\examproblem{4}{Intro to Machine Learning}\\
+
+Consider the task of classifying an image as one of a set of objects. Suppose we use a convolutional neural network to do so (you will learn what this is later in the semester).
+\begin{enumerate}
+	\examproblempart{For this setup, what is the data (often referred to as $x^{(i)}$)?\\}
+	\bookletskip{0.2}
+	
+	\framebox[14.7cm][l]{
+		\begin{minipage}[b]{14.2cm}
+		\inbooklet{Your answer: \HWStudSolAA}
+		
+		\solution{\HWSolAA}
+		\end{minipage}
+	}
+		
+	\examproblempart{For this setup, what is the label (often referred to as $y^{(i)}$)?\\}
+	\bookletskip{0.2}
+	
+	\framebox[14.7cm][l]{
+		\begin{minipage}[b]{14.2cm}
+		\inbooklet{Your answer: \HWStudSolAB}
+		
+		\solution{\HWSolAB}
+		\end{minipage}
+	}
+		
+	\examproblempart{For this setup, what is the model?\\}
+	\bookletskip{0.2}
+	
+	\framebox[14.7cm][l]{
+		\begin{minipage}[b]{14.2cm}
+		\inbooklet{Your answer: \HWStudSolAC}
+		
+		\solution{\HWSolAC}
+		\end{minipage}
+	}
+	
+	\examproblempart{What is the distinction between inference and learning for this task?\\}
+	\bookletskip{0.2}
+	
+	\framebox[14.7cm][l]{
+		\begin{minipage}[b]{14.2cm}
+		\inbooklet{Your answer: \HWStudSolAD}
+		
+		\solution{\HWSolAD}
+		\end{minipage}
+	}
+\end{enumerate}
+
+
+\examproblem{8}{$K$-Nearest Neighbors}\\
+
+\textit{K-Nearest Neighbors} is an extension of the Nearest-Neighbor classification algorithm. Given a set of points with assigned labels, a new point is classified by considering the $K$ points closest to it (according to some metric) and selecting the most common label among these points. One common metric to use for KNN is the squared euclidean distance, i.e.
+\begin{equation}
+d(x^{(1)}, x^{(2)}) = \|x^{(1)} - x^{(2)}\|_2^2
+\end{equation}
+For this problem, consider the following set of points in $\mathbb{R}^2$, each of which is assigned with a label $y \in \{1, 2\}$:\\
+\begin{figure}[h!]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+$x_1$ & $x_2$ & $y$\\
+\hline
+$1$ & $1$ & 2\\
+$0.4$ & $5.2$ & 1\\
+$-2.8$ & $-1.1$ & 2\\
+$3.2$ & $1.4$ & 1\\
+$-1.3$ & $3.2$ & 1\\
+$-3$ & $3.1$ & 2\\
+\hline
+\end{tabular}
+\end{figure}
+\begin{enumerate}
+	\examproblempart{Classify each of the following points using the Nearest Neighbor rule (i.e. $K=1$) with the squared euclidean distance metric.\\}
+	\bookletskip{0.2}
+	
+	\framebox[14.7cm][l]{
+		\begin{minipage}[b]{14.2cm}
+		\inbooklet{Your answer: \HWStudSolBA}
+		
+		\solution{\HWSolBA}
+		\end{minipage}
+	}
+	\\
+	\examproblempart{Classify each of the following points using the 3-Nearest Neighbor rule with the squared euclidean distance metric.\\}
+	\bookletskip{0.2}
+	
+	\framebox[14.7cm][l]{
+		\begin{minipage}[b]{14.2cm}
+		\inbooklet{Your answer: \HWStudSolBB}
+		
+		\solution{\HWSolBB}
+		\end{minipage}
+	}
+	\\
+	\examproblempart{Given a dataset containing $n$ points, what is the outcome of classifying any additional point using the $n$-Nearest Neighbors algorithm?\\}
+	\bookletskip{0.2}
+	
+	\framebox[14.7cm][l]{
+		\begin{minipage}[b]{14.2cm}
+		\inbooklet{Your answer: \HWStudSolBC	}
+		
+		\solution{\HWSolBC}
+		\end{minipage}
+	}
+	\\
+	\examproblempart{How many parameters are \textit{learned} when applying $K$-nearest neighbors?\\}
+	\bookletskip{0.2}
+	
+	\framebox[14.7cm][l]{
+		\begin{minipage}[b]{14.2cm}
+		\inbooklet{Your answer: \HWStudSolBD}
+		
+		\solution{\HWSolBD}
+		\end{minipage}
+	}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%  BEGINNING OF SUBPROBLEMS LIST
+
+ 
+
+ %%%%%%%%%%%% END OF SUBPROBLEMS LIST
+\bookletpage
+%%%%%%%%%%%% END OF PROBLEMS LIST
+\end{enumerate}
+\end{document}
