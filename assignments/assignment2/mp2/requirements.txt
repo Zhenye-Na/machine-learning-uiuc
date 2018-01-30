@@ -1,0 +1,8 @@
+numpy
+scipy
+matplotlib
+scikit-image
+Pillow
+scikit-learn
+pycodestyle
+nose2
