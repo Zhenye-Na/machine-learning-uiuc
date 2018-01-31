@@ -6,7 +6,7 @@ from models.linear_regression import LinearRegression
 
 
 def train_model(processed_dataset, model, learning_rate=0.001, batch_size=16,
-                num_steps=1000, shuffle=False):
+                num_steps=1000, shuffle=True):
     """Implement the training loop of stochastic gradient descent.
 
     Performs stochastic gradient descent with the indicated batch_size.
@@ -25,8 +25,6 @@ def train_model(processed_dataset, model, learning_rate=0.001, batch_size=16,
     Returns:
         model(LinearModel): Returns a trained model.
     """
-    # Perform gradient descent.  learning_rate=0.001
-
     # Seperate the processed_dataset to two parts
     x = processed_dataset[0]
     y = processed_dataset[1]
@@ -39,84 +37,21 @@ def train_model(processed_dataset, model, learning_rate=0.001, batch_size=16,
     if M % batch_size != 0:
         last_batch_size = M % batch_size
         num_batches = M // batch_size + 1
-        # flag = True
-
-    # # Loop num_steps times
-    # for epoch in range(num_steps):
-
-    #     # If shuffle is true:
-    #     # Shuffle data at every epoch, including the 0th epoch.
-
-    #     if (epoch != num_steps - 1):
-    #         if shuffle:
-    #             idx = np.random.randint(low=0, high=M, size=batch_size)
-    #             # shuffled_dataset = np.random.shuffle(processed_dataset)
-    #         else:
-    #             idx = np.arange(epoch * batch_size, (epoch + 1) * batch_size)
-    #     else:
-    #         if shuffle:
-    #             idx = np.random.randint(low=0, high=M, size=last_batch_size)
-    #             # shuffled_dataset = np.random.shuffle(processed_dataset)
-    #         else:
-    #             idx = np.arange(times * batch_size, x.shape[0])
-
-    #     # # work from here
-    #     # # If not, by order
-    #     # if not shuffle and (epoch != times - 1):
-    #     #     idx = np.arange(epoch * batch_size, (epoch + 1) * batch_size)
-    #     # elif not shuffle and (epoch == times - 1):
-    #     #     idx = np.arange(times * batch_size, x.shape[0])
-
-    #     # if shuffle and (epoch != times - 1):
-    #     #     idx = np.arange(epoch * batch_size, (epoch + 1) * batch_size)
-    #     # elif not shuffle and (epoch == times - 1):
-    #     #     idx = np.arange(times * batch_size, x.shape[0])
-
-    #     # Use flag to indicate whether divisible
-    #     if flag and (epoch == num_steps - 1):
-    #         idx = np.random.randint(low=0, high=M, size=last_batch_size)
-
-    #     # Assignment batch for x and y
-    #     x_batch = x[idx]
-    #     y_batch = y[idx]
-
-    #     model.w = update_step(x_batch, y_batch, model, learning_rate)
-
-    # if shuffle:
-    #     pass
-    # if processed_dataset.shape[0] % batch_size != 0:
-    #     last_batch_size = processed_dataset.shape[0] % batch_size
-    #     num_batches = processed_dataset.shape[0] // batch_size + 1
-
-    #     for num_batch in range(num_batches):
-    #         shuffled_dataset = np.random.shuffle(processed_dataset)
-
-    # for batch in range(num_batches):
-    #     if (batch == num_batches - 1):
-    #         if shuffle:
-    #             idx = np.random.randint(low=0, high=M, size=last_batch_size)
-    #             # shuffled_dataset = np.random.shuffle(processed_dataset)
-    #         else:
-    #             idx = np.arange(batch * batch_size, x.shape[0])
-    #     else:
-    #         if shuffle:
-    #             idx = np.random.randint(low=0, high=M, size=batch_size)
-    #             # shuffled_dataset = np.random.shuffle(processed_dataset)
-    #         else:
-    #             idx = np.arange(batch * batch_size, (batch + 1) * batch_size)
 
         for step in range(num_steps):
+
+            idx_total = np.arange(M)
+            np.random.shuffle(idx_total)
+
             for batch in range(num_batches):
                 if (batch == num_batches - 1):
                     if shuffle:
-                        idx = np.random.randint(low=0, high=M, size=last_batch_size)
-                        # shuffled_dataset = np.random.shuffle(processed_dataset)
+                        idx = idx_total[batch * batch_size:]
                     else:
                         idx = np.arange(batch * batch_size, x.shape[0])
                 else:
                     if shuffle:
-                        idx = np.random.randint(low=0, high=M, size=batch_size)
-                        # shuffled_dataset = np.random.shuffle(processed_dataset)
+                        idx = idx_total[batch * batch_size:(batch + 1) * batch_size]
                     else:
                         idx = np.arange(batch * batch_size, (batch + 1) * batch_size)
 
@@ -158,7 +93,8 @@ def train_model_analytic(processed_dataset, model):
 
     # weight is a (N,1) column vector
     x = np.concatenate((x, np.ones((x.shape[0], 1))), axis=1)
-    model.w = np.linalg.inv(x.T.dot(x)).dot(x.T).dot(y)
+
+    model.w = np.linalg.inv(x.T.dot(x) + model.w_decay_factor * np.ones((x.T.dot(x).shape))).dot(x.T).dot(y)
     return model.w
 
 
@@ -174,14 +110,10 @@ def eval_model(processed_dataset, model):
     """
     # Seperate the processed_dataset to two parts
     x = processed_dataset[0]
-    # y = np.reshape(processed_dataset[1], (x.shape[0], 1))
     y = processed_dataset[1]
-    # print(x.shape)
-    # print(y.shape)
-    # Compute forward
+
     f = model.forward(x)
-    # print(f.shape)
-    # print("")
+
     # You can disregard accuracy.
     loss = model.total_loss(f, y)
     return loss
