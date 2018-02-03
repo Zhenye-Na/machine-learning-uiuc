@@ -8,7 +8,7 @@ All assignments are due at 11:59AM Central Time (Just before noon). See syllabus
 ## Assignments
 * Assignment 1: Introduction + Python — Design by Colin, Review by Yucheng
 * Assignment 2: Linear Regression — Design by Raymond, Review by Jyoti
-* Assignment 3: Binary Classification Design by Youjie, Review by Jyoti
+* Assignment 3: Binary Classification — Design by Youjie, Review by Jyoti
 * Assignment 4: Support Vector Machine — Design by Raymond, Review by Ishan
 * Assignment 5: Multiclass Classification — Design by Yucheng, Review by Safa
 * Assignment 6: Deep Neural Networks — Design by Safa, Review by Yuan-Ting
