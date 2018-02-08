@@ -63,7 +63,7 @@ class LinearRegression(LinearModel):
         total_loss = squared_loss + reg
 
         # return total_loss[0][0]
-        return '%e' % total_loss
+        return total_loss
 
     def predict(self, f):
         """Nothing to do here."""
