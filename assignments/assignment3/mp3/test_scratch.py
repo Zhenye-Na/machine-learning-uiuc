@@ -5,6 +5,7 @@ import numpy as np
 from codefromscratch import io_tools
 from codefromscratch import logistic_model
 
+
 class ScratchTests(unittest.TestCase):
     def setUp(self):
         # load dataset
@@ -12,23 +13,24 @@ class ScratchTests(unittest.TestCase):
         self.T = None
         self.N = None
         try:
-            self.A, self.T = io_tools.read_dataset(path_to_dataset_folder='data/trainset',index_filename='indexing.txt')
+            self.A, self.T = io_tools.read_dataset(
+                path_to_dataset_folder='data/trainset', index_filename='indexing.txt')
             self.N = len(self.T)
-        except:
+        except BaseException:
             pass
         # Initialize model.
         self.model = None
         self.model_W = None
         try:
-            self.model = logistic_model.LogisticModel(ndims = 16, W_init = 'zeros')
+            self.model = logistic_model.LogisticModel(ndims=16, W_init='zeros')
             self.model_W = self.model.W
-        except:
+        except BaseException:
             pass
-        
+
     def test_read_dataset_not_none(self):
         self.assertIsNotNone(self.A)
         self.assertIsNotNone(self.T)
-    
+
     def test_init_model_not_none(self):
         self.assertIsNotNone(self.model)
         self.assertIsNotNone(self.model_W)
