@@ -22,6 +22,6 @@ Probability, linear algebra, and proficiency in Python.
 (2) Deep Learning by Ian Goodfellow and Yoshua Bengio and Aaron Courville, 
 (3) Pattern Recognition and Machine Learning by Christopher Bishop, (4) Graphical Models by Daphne Koller and Nir Friedman. 
 
-## Istructors:
+## Instructors:
 - Alexander Schwing, Website [[Link]](http://www.alexander-schwing.de/)
 - Matus Telgarsky, Website [[Link]](http://mjt.web.engr.illinois.edu/)
