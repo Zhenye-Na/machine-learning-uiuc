@@ -18,9 +18,10 @@ The goal of Machine Learning is to build computer systems that can adapt and lea
 Probability, linear algebra, and proficiency in Python. 
 
 ## Recommended Text: 
-(1) Machine Learning: A Probabilistic Perspective by Kevin Murphy, 
-(2) Deep Learning by Ian Goodfellow and Yoshua Bengio and Aaron Courville, 
-(3) Pattern Recognition and Machine Learning by Christopher Bishop, (4) Graphical Models by Daphne Koller and Nir Friedman. 
+1. Machine Learning: A Probabilistic Perspective by Kevin Murphy, 
+2. Deep Learning by Ian Goodfellow and Yoshua Bengio and Aaron Courville, 
+3. Pattern Recognition and Machine Learning by Christopher Bishop, 
+4. Graphical Models by Daphne Koller and Nir Friedman. 
 
 ## Instructors:
 - Alexander Schwing, Website [[Link]](http://www.alexander-schwing.de/)
