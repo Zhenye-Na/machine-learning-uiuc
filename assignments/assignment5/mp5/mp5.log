@@ -6,7 +6,7 @@ test_self_ovo_accuracy (test.TestSklearn) ... ok
 test_self_ovr_accuracy (test.TestSklearn) ... ok
 test_sklearn_crammer_accuracy (test.TestSklearn) ... ok
 test_sklearn_ovo_accuracy (test.TestSklearn) ... ok
-test_sklearn_ovr_accuracy (test.TestSklearn) ... FAIL
+test_sklearn_ovr_accuracy (test.TestSklearn) ... ok
 
 ----------------------------------------------------------------------
 Ran 9 tests in 79.853s
