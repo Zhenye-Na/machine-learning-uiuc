@@ -11,36 +11,6 @@ test_one_hot (test_io.IoToolsTests) ... ok
 test_read_dataset_not_none (test_io.IoToolsTests) ... ok
 
 ======================================================================
-ERROR: test_loss_no_loss (test_model.ModelTests)
-----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/home/cs446grader/autograder/mp2_programming/submissions/zna2/tests_autograder/test_model.py", line 42, in test_loss_no_loss
-    self.assertAlmostEqual(loss, 0.5)
-  File "/software/python-3.4.3/lib/python3.4/unittest/case.py", line 838, in assertAlmostEqual
-    if round(abs(second-first), places) == 0:
-TypeError: unsupported operand type(s) for -: 'float' and 'str'
-
-======================================================================
-ERROR: test_loss_no_reg (test_model.ModelTests)
-----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/home/cs446grader/autograder/mp2_programming/submissions/zna2/tests_autograder/test_model.py", line 33, in test_loss_no_reg
-    self.assertAlmostEqual(loss, .5)
-  File "/software/python-3.4.3/lib/python3.4/unittest/case.py", line 838, in assertAlmostEqual
-    if round(abs(second-first), places) == 0:
-TypeError: unsupported operand type(s) for -: 'float' and 'str'
-
-======================================================================
-ERROR: test_no_loss_with_reg (test_model.ModelTests)
-----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/home/cs446grader/autograder/mp2_programming/submissions/zna2/tests_autograder/test_model.py", line 51, in test_no_loss_with_reg
-    self.assertAlmostEqual(loss, 3.)
-  File "/software/python-3.4.3/lib/python3.4/unittest/case.py", line 838, in assertAlmostEqual
-    if round(abs(second-first), places) == 0:
-TypeError: unsupported operand type(s) for -: 'float' and 'str'
-
-======================================================================
 ERROR: test_analytic (test_analytic.ModelTests)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
@@ -57,4 +27,4 @@ numpy.linalg.linalg.LinAlgError: Singular matrix
 ----------------------------------------------------------------------
 Ran 11 tests in 0.017s
 
-FAILED (errors=4)
+FAILED (errors=1)
