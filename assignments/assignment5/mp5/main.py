@@ -8,11 +8,11 @@ if __name__ == '__main__':
     print('Loading data...')
     mnist = np.loadtxt('data/mnist_test.csv', delimiter=',')
 
-    X_train = mnist[:len(mnist)//2, 1:]
-    y_train = mnist[:len(mnist)//2, 0].astype(np.int)
+    X_train = mnist[:len(mnist) // 2, 1:]
+    y_train = mnist[:len(mnist) // 2, 0].astype(np.int)
 
-    X_test = mnist[len(mnist)//2:, 1:]
-    y_test = mnist[len(mnist)//2:, 0].astype(np.int)
+    X_test = mnist[len(mnist) // 2:, 1:]
+    y_test = mnist[len(mnist) // 2:, 0].astype(np.int)
 
     print('Training Sklearn OVR...')
     y_pred_train, y_pred_test = sklearn_multiclass_prediction(

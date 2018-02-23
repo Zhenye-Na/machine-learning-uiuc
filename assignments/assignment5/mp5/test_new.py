@@ -9,12 +9,12 @@ from model.self_multiclass import MulticlassSVM
 class TestSklearn(unittest.TestCase):
 
     def setUp(self):
-        self.X_train = TestSklearn.mnist[:len(TestSklearn.mnist)//5, 1:]
-        self.y_train = (TestSklearn.mnist[:len(TestSklearn.mnist)//5, 0]
+        self.X_train = TestSklearn.mnist[:len(TestSklearn.mnist) // 5, 1:]
+        self.y_train = (TestSklearn.mnist[:len(TestSklearn.mnist) // 5, 0]
                         .astype(np.int))
 
-        self.X_test = TestSklearn.mnist[len(TestSklearn.mnist)//5:, 1:]
-        self.y_test = (TestSklearn.mnist[len(TestSklearn.mnist)//5:, 0]
+        self.X_test = TestSklearn.mnist[len(TestSklearn.mnist) // 5:, 1:]
+        self.y_test = (TestSklearn.mnist[len(TestSklearn.mnist) // 5:, 0]
                        .astype(np.int))
 
         self.X = np.array([[0.74062279, 0.17422722],
@@ -39,8 +39,8 @@ class TestSklearn(unittest.TestCase):
         train_acc = metrics.accuracy_score(self.y_train, y_pred_train)
         test_acc = metrics.accuracy_score(self.y_test, y_pred_test)
 
-        self.assertTrue(abs(train_acc - 1.0) < 1e-6)
-        self.assertTrue(abs(test_acc - 0.814875) < 1e-6)
+        self.assertTrue(abs(train_acc - 1.0) < 5e-3)
+        self.assertTrue(abs(test_acc - 0.814875) < 5e-3)
 
     def test_sklearn_ovo_accuracy(self):
         y_pred_train, y_pred_test = sklearn_multiclass_prediction(
@@ -49,8 +49,8 @@ class TestSklearn(unittest.TestCase):
         train_acc = metrics.accuracy_score(self.y_train, y_pred_train)
         test_acc = metrics.accuracy_score(self.y_test, y_pred_test)
 
-        self.assertTrue(abs(train_acc - 1.0) < 1e-6)
-        self.assertTrue(abs(test_acc - 0.892625) < 1e-6)
+        self.assertTrue(abs(train_acc - 1.0) < 5e-3)
+        self.assertTrue(abs(test_acc - 0.892625) < 5e-3)
 
     def test_sklearn_crammer_accuracy(self):
         y_pred_train, y_pred_test = sklearn_multiclass_prediction(
@@ -59,8 +59,8 @@ class TestSklearn(unittest.TestCase):
         train_acc = metrics.accuracy_score(self.y_train, y_pred_train)
         test_acc = metrics.accuracy_score(self.y_test, y_pred_test)
 
-        self.assertTrue(abs(train_acc - 1.0) < 1e-6)
-        self.assertTrue(abs(test_acc - 0.85825) < 1e-6)
+        self.assertTrue(abs(train_acc - 1.0) < 5e-3)
+        self.assertTrue(abs(test_acc - 0.85825) < 5e-3)
 
     def test_self_ovr_accuracy(self):
         self_ovr = MulticlassSVM('ovr')
@@ -71,8 +71,8 @@ class TestSklearn(unittest.TestCase):
         test_acc = metrics.accuracy_score(
             self.y_test, self_ovr.predict(self.X_test))
 
-        self.assertTrue(abs(train_acc - 1.0) < 1e-6)
-        self.assertTrue(abs(test_acc - 0.814875) < 1e-6)
+        self.assertTrue(abs(train_acc - 1.0) < 5e-3)
+        self.assertTrue(abs(test_acc - 0.814875) < 5e-3)
 
     def test_self_ovo_accuracy(self):
         self_ovr = MulticlassSVM('ovo')

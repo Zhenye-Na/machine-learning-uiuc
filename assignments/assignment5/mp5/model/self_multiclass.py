@@ -72,7 +72,14 @@ class MulticlassSVM:
             binary_svm: a dictionary with labels as keys,
                         and binary SVM models as values.
         '''
-        pass
+        binary_svm = {}
+        for i in range(self.labels.shape[0]):
+            temp = np.copy(y)
+            temp[y != self.labels[i]] = 0
+            temp[y == self.labels[i]] = 1
+            clf = svm.LinearSVC(random_state=12345)
+            binary_svm[self.labels[i]] = clf.fit(X, temp)
+        return binary_svm
 
     def bsvm_ovo_student(self, X, y):
         '''
@@ -85,7 +92,16 @@ class MulticlassSVM:
             binary_svm: a dictionary with label pairs as keys,
                         and binary SVM models as values.
         '''
-        pass
+        binary_svm = {}
+        summation = np.hstack((np.reshape(y, (X.shape[0], 1)), X))
+        for i in range(self.labels.shape[0]):
+            for j in range(i + 1, self.labels.shape[0]):
+                tempi = summation[y == i]
+                tempj = summation[y == j]
+                temp = np.vstack((tempi, tempj))
+                clf = svm.LinearSVC(random_state=12345)
+                binary_svm[tuple((i, j))] = clf.fit(temp[:, 1:], temp[:, 0])
+        return binary_svm
 
     def scores_ovr_student(self, X):
         '''
@@ -97,7 +113,11 @@ class MulticlassSVM:
         Returns:
             scores: a numpy ndarray with scores.
         '''
-        pass
+        scores = []
+        for idx in self.labels:
+            scores.append(self.binary_svm[idx].decision_function(X))
+        scores = np.array(scores)
+        return np.transpose(scores)
 
     def scores_ovo_student(self, X):
         '''
@@ -109,7 +129,18 @@ class MulticlassSVM:
         Returns:
             scores: a numpy ndarray with scores.
         '''
-        pass
+        scores = []
+        temp = []
+        for idx in self.binary_svm:
+            temp.append(self.binary_svm[idx].predict(X))
+
+        np_temp = np.transpose(np.array(temp))
+
+        for i in range(np_temp.shape[0]):
+            item = np_temp[i, :]
+            item = item.astype(np.int)
+            scores.append(np.bincount(item, minlength=self.labels.shape[0]))
+        return np.array(scores)
 
     def loss_student(self, W, X, y, C=1.0):
         '''
@@ -126,7 +157,37 @@ class MulticlassSVM:
         Returns:
             The value of loss function given W, X and y.
         '''
-        pass
+        # Loss function = 1/2 * ||W||^2 + max(sum(1 - delta + w_j^Tx) - w_yi^Tx)
+        # Loss of regularization
+        reg_loss = 0.5 * np.trace(W.dot(W.T))
+
+        # Number of observations and number of classes
+        N = X.shape[0]
+        K = W.shape[0]
+
+        # Initialize Delta matrix
+        Delta = np.zeros((K, N))
+        for j in range(K):
+            for i in range(N):
+                if j == y[i]:
+                    Delta[j, i] = 1
+        I = np.ones((K, N))
+        sub = I - Delta + W.dot(X.T)
+        sub = np.reshape(np.amax(sub, axis=0), (N, 1))
+
+        # Initialize w_yi^Tx
+        foo = []
+        for i in range(N):
+            # foo[i] = W[y[i], :].dot((X[i, :]).T)
+            foo.append(W[y[i]].dot((X[i]).T))
+        foo = np.reshape(np.array(foo), (N, 1))
+
+        # Max loss
+        max_loss = C * np.sum(sub - foo)
+
+        # Combine together
+        total_loss = reg_loss + max_loss
+        return total_loss
 
     def grad_student(self, W, X, y, C=1.0):
         '''
@@ -144,4 +205,32 @@ class MulticlassSVM:
             The graident of loss function w.r.t. W,
             in a numpy array of shape (K, d).
         '''
-        pass
+        # Gradient of regularization
+        reg_grad = W
+
+        # Number of observations and number of classes
+        N = X.shape[0]
+        K = W.shape[0]
+
+        # Initialize Delta matrix
+        Delta = np.zeros((K, N))
+        for j in range(K):
+            for i in range(N):
+                if j == y[i]:
+                    Delta[j, i] = 1
+        I = np.ones((K, N))
+        sub = I - Delta + W.dot(X.T)
+        # # reshape
+        # rsub = np.reshape(np.amax(sub, axis=0), (N, 1))
+        # Which j is the max in max expression
+        idx = np.argmax(sub, axis=0)
+        max_grad = np.zeros_like(W)
+
+        # Compute gradient for max()
+        for num, val in enumerate(idx):
+            max_grad[val, :] += X[num, :]
+            max_grad[y[num], :] -= X[num, :]
+
+        # Combine together
+        total_grad = reg_grad + max_grad * C
+        return total_grad
