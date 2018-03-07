@@ -109,10 +109,10 @@ class LinearMRF(object):
         # IMPLEMENT THIS METHOD #
         #########################
         # Initialize f_unary
-        f_unary = np.zeros((self.width * self.height, 2), np.int32)
+        f_unary = np.zeros((self.width * self.height, 2))
 
         # Query for y_i
-        y_i = np.reshape(np.copy(img), (self.width * self.height,))
+        y_i = np.copy(img).flatten()
 
         # f_unary(x_i, y_i) = 1[x_i == y_i]
         f_unary[np.where(y_i == 0), 0] = 1
@@ -180,8 +180,8 @@ class LinearMRF(object):
         #########################
         # IMPLEMENT THIS METHOD #
         #########################
-        unary_potentials = tf.multiply(self.unary_weight, unary_features)
-        return unary_potentials
+        # unary_potentials = tf.multiply(self.unary_weight, unary_features)
+        return tf.multiply(self.unary_weight, unary_features)
 
     def calculate_pairwise_potentials(self, pairwise_features):
         """Calculates the full matrix of pairwise potentials for a provided
@@ -206,8 +206,8 @@ class LinearMRF(object):
         #########################
         # IMPLEMENT THIS METHOD #
         #########################
-        pairwise_potentials = tf.multiply(self.pairwise_weight, pairwise_features)
-        return pairwise_potentials
+        # pairwise_potentials = tf.multiply(self.pairwise_weight, pairwise_features)
+        return tf.multiply(self.pairwise_weight, pairwise_features)
 
     def build_training_obj(self, img_features, unary_beliefs, pair_beliefs,
                            unary_potentials, pairwise_potentials):
@@ -237,7 +237,7 @@ class LinearMRF(object):
 
         # Compute unary_loss
         # unary_loss = tf.reduce_sum(tf.multiply(unary_beliefs, unary_potentials))
-        
+
         # for num in range(len(unary_beliefs)):
         #     # unary_loss += tf.reduce_sum(tf.multiply(unary_beliefs[i][:, 0], unary_potentials[i][:,0]) + 
         #     #     tf.multiply(unary_beliefs[i][:, 1], unary_potentials[i][:, 1]), 0)
@@ -246,7 +246,7 @@ class LinearMRF(object):
 
         # Compute unary_loss
         # pairwise_loss = tf.reduce_sum(tf.multiply(pair_beliefs, pairwise_potentials))
-        
+
         # for i in range(len(pair_beliefs)):
         #     # pairwise_loss += tf.reduce_sum(tf.multiply(pair_beliefs[i][:, 0], pairwise_potentials[i][:,0]) + 
         #     #     tf.multiply(pair_beliefs[i][:, 1], pairwise_potentials[i][:, 1]) + 
@@ -260,15 +260,15 @@ class LinearMRF(object):
             # tf.multiply(self.pairwise_weight, tf.convert_to_tensor(img_features, dtype=pairwise_potentials.dtype)))
         # F = tf.reduce_sum(tf.multiply(self.unary_weight, img_features))
 
-        F = tf.reduce_sum
+        # F = tf.reduce_sum
 
-    
+
         unary_loss = tf.reduce_sum(tf.multiply(unary_beliefs, unary_potentials))
         pairwise_loss = tf.reduce_sum(tf.multiply(pair_beliefs, pairwise_potentials))
 
-        F = tf.reduce_sum(tf.multiply(self.unary_weight, tf.convert_to_tensor(img_features, dtype=unary_potentials.dtype)) + 
-            tf.multiply(self.pairwise_weight, tf.convert_to_tensor(img_features, dtype=pairwise_potentials.dtype)))
-        # F = tf.reduce_sum(tf.multiply(self.unary_weight, img_features))
+        # F = tf.reduce_sum(tf.multiply(self.unary_weight, tf.convert_to_tensor(img_features, dtype=unary_potentials.dtype)) + 
+            # tf.multiply(self.pairwise_weight, tf.convert_to_tensor(img_features, dtype=pairwise_potentials.dtype)))
+        F = tf.reduce_sum(tf.multiply(self.unary_weight, img_features))
 
         # Compute traning object
         obj = unary_loss + pairwise_loss - F
@@ -476,7 +476,7 @@ class LinearMRF(object):
         #########################
         # IMPLEMENT THIS METHOD #
         #########################
-        
+
         # Initialize random order
         random_idx = np.arange(unary_beliefs.shape[0])
         np.random.shuffle(random_idx)
@@ -524,7 +524,7 @@ class LinearMRF(object):
         #########################
         # IMPLEMENT THIS METHOD #
         #########################
-        sum1 = unary_potentials[node, assignment] * unary_beliefs[node, assignment]
+        sum1 = unary_potentials[node, assignment]
         sum2 = 0
 
         for neighbor in self.neighbors[node]:
@@ -535,11 +535,11 @@ class LinearMRF(object):
 
             if assignment == 0 and y_j == 0:
                 idx = 0
-            elif assignment == 0 and y_j == 1:
+            if assignment == 0 and y_j == 1:
                 idx = 1
-            elif assignment == 1 and y_j == 0:
+            if assignment == 1 and y_j == 0:
                 idx = 2
-            elif assignment == 1 and y_j == 1:
+            if assignment == 1 and y_j == 1:
                 idx = 3
 
             sum2 += pairwise_potentials[self.pair_inds[(node, neighbor)], idx]
