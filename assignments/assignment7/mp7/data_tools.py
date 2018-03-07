@@ -4,7 +4,8 @@
 
 import numpy as np
 import pylab as pl
-
+import matplotlib
+matplotlib.use('Agg')
 
 def load_dataset(input_file_path, num_samples):
     """
@@ -37,7 +38,7 @@ def load_image(input_file_path):
     """
     img = pl.imread(input_file_path)
     img = img[:, :, 0]
-    img = np.where(I < 0.1, 0, 1)
+    img = np.where(img < 0.1, 0, 1)
 
     return img
 

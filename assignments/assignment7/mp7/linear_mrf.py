@@ -4,10 +4,10 @@ from collections import defaultdict
 
 
 class LinearMRF(object):
-    '''Class implementing the MRF used for denoising'''
+    """Class implementing the MRF used for denoising"""
 
     def __init__(self, width, height):
-        '''Initializes the MRF model.
+        """Initializes the MRF model.
 
         Specifically, the model used is a grid graph, i.e. there is a
         node for every pixel in an image and a pair connecting every pair
@@ -38,7 +38,7 @@ class LinearMRF(object):
                 are a list of integers representing the nodes adjacent to
                 the specified node in the MRF
             pairwise_features(np.array): The pairwise features for the model
-        '''
+        """
         self.width = width
         self.height = height
         self.unary_weight = tf.Variable(1.)
@@ -52,10 +52,10 @@ class LinearMRF(object):
         # Initialize neighbors, pairs, and pair_inds
         for row in range(height):
             for col in range(width):
-                ind1 = row*width + col
+                ind1 = row * width + col
 
                 if row > 0:
-                    ind2 = (row-1)*width + col
+                    ind2 = (row - 1) * width + col
                     self.pairs.append((ind2, ind1))
                     self.pair_inds[(ind2, ind1)] = i
                     self.pair_inds[(ind1, ind2)] = i
@@ -65,7 +65,7 @@ class LinearMRF(object):
 
                     i += 1
                 if col > 0:
-                    ind2 = row*width + (col-1)
+                    ind2 = row * width + (col - 1)
                     self.pairs.append((ind2, ind1))
                     self.pair_inds[(ind2, ind1)] = i
                     self.pair_inds[(ind1, ind2)] = i
@@ -79,7 +79,8 @@ class LinearMRF(object):
         self.pairwise_features = self.get_pairwise_features()
 
     def get_unary_features(self, img):
-        '''Calculates the full matrix of unary features for a provided
+        """Calculate the full matrix of unary features for a provided.
+
         set of values (which can be either the noisy observations or the
         true image)
 
@@ -103,14 +104,24 @@ class LinearMRF(object):
         Returns:
             (np.array): An array of size (width x height, 2) containing the
               features for an image
-        '''
-        #######################
-        #IMPLEMENT THIS METHOD#
-        #######################
-        return None
+        """
+        #########################
+        # IMPLEMENT THIS METHOD #
+        #########################
+        # Initialize f_unary
+        f_unary = np.zeros((self.width * self.height, 2), np.int32)
+
+        # Query for y_i
+        y_i = np.reshape(np.copy(img), (self.width * self.height,))
+
+        # f_unary(x_i, y_i) = 1[x_i == y_i]
+        f_unary[np.where(y_i == 0), 0] = 1
+        f_unary[np.where(y_i == 1), 1] = 1
+
+        return f_unary
 
     def get_pairwise_features(self):
-        '''Calculates the full matrix of pairwise features.
+        """Calculate the full matrix of pairwise features.
 
         Recall that, for a given set of possible assignments y_i and y_j to
         a pair of nodes (i, j) in the graph, the feature function you should
@@ -133,14 +144,21 @@ class LinearMRF(object):
         Returns:
             (np.array): An array of size (len(pairs), 4) containing the
               pairwise features for an image
-        '''
-        #######################
-        #IMPLEMENT THIS METHOD#
-        #######################
-        return None
+        """
+        #########################
+        # IMPLEMENT THIS METHOD #
+        #########################
+        # Initialize f_pairwise
+        # zero = np.zeros((len(self.pairs), 1))
+        # one = np.ones((len(self.pairs), 1))
+        # f_pairwise = np.ones((len(self.pairs), 1))
+        # f_pairwise = np.hstack((f_pairwise, zero))
+        # f_pairwise = np.hstack((f_pairwise, zero))
+        # f_pairwise = np.hstack((f_pairwise, one))
+        return np.array([[1, 0, 0, 1], ] * len(self.pairs))
 
     def calculate_unary_potentials(self, unary_features):
-        '''Calculates the full matrix of unary potentials for a provided
+        """Calculates the full matrix of unary potentials for a provided
         matrix of unary features.
 
         Recall that, for a given node observation x_i and an assignment y_i to
@@ -158,14 +176,15 @@ class LinearMRF(object):
         Returns:
             (tf.Tensor): The unary potentials, which is a rank-2 tensor of the
               same size as the unary_features.
-        '''
-        #######################
-        #IMPLEMENT THIS METHOD#
-        #######################
-        return None
+        """
+        #########################
+        # IMPLEMENT THIS METHOD #
+        #########################
+        unary_potentials = tf.multiply(self.unary_weight, unary_features)
+        return unary_potentials
 
     def calculate_pairwise_potentials(self, pairwise_features):
-        '''Calculates the full matrix of pairwise potentials for a provided
+        """Calculates the full matrix of pairwise potentials for a provided
         matrix of pairwise features.
 
         Recall that, for a given pair of assignments y_i and y_j to nodes i
@@ -183,15 +202,16 @@ class LinearMRF(object):
         Returns:
             (tf.Tensor): The pairwise potentials, which is a rank-2 tensor of
               the same size as the pairwise_features
-        '''
-        #######################
-        #IMPLEMENT THIS METHOD#
-        #######################
-        return None
+        """
+        #########################
+        # IMPLEMENT THIS METHOD #
+        #########################
+        pairwise_potentials = tf.multiply(self.pairwise_weight, pairwise_features)
+        return pairwise_potentials
 
     def build_training_obj(self, img_features, unary_beliefs, pair_beliefs,
                            unary_potentials, pairwise_potentials):
-        '''Builds the training objective, as specified in the handout.
+        """Build the training objective, as specified in the handout.
 
         Hint: the image features can be thought of as a "correct" set of
         beliefs for that image
@@ -201,25 +221,62 @@ class LinearMRF(object):
                 true image (as returned by get_unary_features)
             unary_beliefs(list(tf.Tensor)): A list of the unary beliefs
                 for each of the noisy samples
-            pair_beliefs(tf.Tensor): A list of the pairwise beliefs for each
+            pair_beliefs(list(tf.Tensor)): A list of the pairwise beliefs for each
                 of the noisy samples
             unary_potentials(list(tf.Tensor)): A list of the unary potentials
                 for each of the noisy samples. Each entry is a rank-2 tensor
                 of size (height x width, 2)
             pairwise_potentials(tf.Tensor): The pairwise potentials, which is
-                a rank-2 tensor of size (height x width, 4)
+                a rank-2 tensor of size (len(pairs) * 4, 1)
         Returns:
             (tf.Tensor): the training objective, which is a rank-0 tensor
-        '''
-        obj = 0
-        #######################
-        #IMPLEMENT THIS METHOD#
-        #######################
+        """
+        #########################
+        # IMPLEMENT THIS METHOD #
+        #########################
+
+        # Compute unary_loss
+        # unary_loss = tf.reduce_sum(tf.multiply(unary_beliefs, unary_potentials))
+        
+        # for num in range(len(unary_beliefs)):
+        #     # unary_loss += tf.reduce_sum(tf.multiply(unary_beliefs[i][:, 0], unary_potentials[i][:,0]) + 
+        #     #     tf.multiply(unary_beliefs[i][:, 1], unary_potentials[i][:, 1]), 0)
+        #     for d in range(unary_beliefs[0].shape[1]):
+        #         unary_loss += tf.reduce_sum(tf.multiply(unary_beliefs[num][:, d], unary_potentials[num][:,d]))
+
+        # Compute unary_loss
+        # pairwise_loss = tf.reduce_sum(tf.multiply(pair_beliefs, pairwise_potentials))
+        
+        # for i in range(len(pair_beliefs)):
+        #     # pairwise_loss += tf.reduce_sum(tf.multiply(pair_beliefs[i][:, 0], pairwise_potentials[i][:,0]) + 
+        #     #     tf.multiply(pair_beliefs[i][:, 1], pairwise_potentials[i][:, 1]) + 
+        #     #         tf.multiply(pair_beliefs[i][:, 2], pairwise_potentials[i][:, 2]) + 
+        #     #             tf.multiply(pair_beliefs[i][:, 3], pairwise_potentials[i][:, 3]), 0)
+        #     for d in range(pair_beliefs[0].shape[1]):
+        #         unary_loss += tf.reduce_sum(tf.multiply(pair_beliefs[num][:, d], pairwise_potentials[:, d]))
+
+        # Compute F
+        # F = tf.reduce_sum(tf.multiply(self.unary_weight, tf.convert_to_tensor(img_features, dtype=unary_potentials.dtype)) + 
+            # tf.multiply(self.pairwise_weight, tf.convert_to_tensor(img_features, dtype=pairwise_potentials.dtype)))
+        # F = tf.reduce_sum(tf.multiply(self.unary_weight, img_features))
+
+        F = tf.reduce_sum
+
+    
+        unary_loss = tf.reduce_sum(tf.multiply(unary_beliefs, unary_potentials))
+        pairwise_loss = tf.reduce_sum(tf.multiply(pair_beliefs, pairwise_potentials))
+
+        F = tf.reduce_sum(tf.multiply(self.unary_weight, tf.convert_to_tensor(img_features, dtype=unary_potentials.dtype)) + 
+            tf.multiply(self.pairwise_weight, tf.convert_to_tensor(img_features, dtype=pairwise_potentials.dtype)))
+        # F = tf.reduce_sum(tf.multiply(self.unary_weight, img_features))
+
+        # Compute traning object
+        obj = unary_loss + pairwise_loss - F
         return obj
 
     def train(self, original_img, noisy_samples, lr, num_epochs,
               convergence_margin):
-        '''Trains the model using the provided data and training parameters.
+        """Train the model using the provided data and training parameters.
 
         Args:
             original_img(np.array): The true, denoised image
@@ -228,14 +285,14 @@ class LinearMRF(object):
             num_epochs(int): The number of training iterations
             convergence_margin(float): The convergence margin for inference
                 (see run_greedy_inference for more details)
-        '''
+        """
 
         # Initialize placeholders for beliefs
         unary_belief_placeholders = []
         pairwise_belief_placeholders = []
         for i in range(len(noisy_samples)):
             unary_belief_placeholders.append(tf.placeholder(tf.float32,
-                                             [self.height*self.width, 2]))
+                                             [self.height * self.width, 2]))
             pairwise_belief_placeholders.append(tf.placeholder(tf.float32,
                                                 [len(self.pairs), 4]))
 
@@ -258,6 +315,7 @@ class LinearMRF(object):
                             for feat in noisy_features]
         pairwise_potentials = self.calculate_pairwise_potentials(
                 self.pairwise_features)
+
         train_obj = self.build_training_obj(img_features,
                                             unary_belief_placeholders,
                                             pairwise_belief_placeholders,
@@ -270,7 +328,7 @@ class LinearMRF(object):
             sess.run(tf.global_variables_initializer())
 
             for epoch in range(num_epochs):
-                print("EPOCH %d" % (epoch+1))
+                print("EPOCH %d" % (epoch + 1))
 
                 # First: Calculate Potentials
                 nodes = [pairwise_potentials] + unary_potentials
@@ -305,7 +363,7 @@ class LinearMRF(object):
                 results = sess.run(nodes, feed_dict)
 
     def test(self, noisy_samples, convergence_margin):
-        '''Given a list of noisy samples of an image, produce denoised
+        """Given a list of noisy samples of an image, produce denoised
         versions of that image.
 
         Args:
@@ -314,7 +372,7 @@ class LinearMRF(object):
                 (see run_greedy_inference for more details)
         Returns:
             (list(np.array)): The denoised images
-        '''
+        """
 
         # Initialize Beliefs
         unary_beliefs = []
@@ -345,9 +403,9 @@ class LinearMRF(object):
         return denoised_imgs
 
     def beliefs2img(self, unary_belief):
-        '''Converts a provided set of beliefs into the correct format for
+        """Convert a provided set of beliefs into the correct format for
         an image by setting each pixel to the value that has belief 1
-        '''
+        """
         result = np.empty(len(unary_belief))
         for i in range(len(unary_belief)):
             if unary_belief[i, 0] == 1:
@@ -358,10 +416,10 @@ class LinearMRF(object):
 
     def run_greedy_inference(self, unary_beliefs, unary_pots, pairwise_pots,
                              convergence_margin):
-        '''Runs our greedy inference procedure on the provided lists of
+        """Run our greedy inference procedure on the provided lists of
         beliefs/potentials. Note that we run inference for a maximum of 10
         iterations per image.
-        '''
+        """
         new_unary_beliefs = []
         new_pairwise_beliefs = []
 
@@ -391,7 +449,7 @@ class LinearMRF(object):
         return new_unary_beliefs, new_pairwise_beliefs
 
     def inference_itr(self, unary_beliefs, unary_pots, pairwise_pots):
-        '''Run a single iteration of inference with the provided beliefs
+        """Run a single iteration of inference with the provided beliefs
         and potentials.
 
         Here, inference should be implemented as a simple (randomized) greedy
@@ -413,16 +471,33 @@ class LinearMRF(object):
         Returns:
             (np.array): The new set of unary beliefs, having the same shape
               as the input set of unary beliefs.
-        '''
+        """
         unary_beliefs = unary_beliefs.copy()
-        #######################
-        #IMPLEMENT THIS METHOD#
-        #######################
+        #########################
+        # IMPLEMENT THIS METHOD #
+        #########################
+        
+        # Initialize random order
+        random_idx = np.arange(unary_beliefs.shape[0])
+        np.random.shuffle(random_idx)
+
+        for node_idx in random_idx:
+            # Calculate the scores
+            score_0 = self.calculate_local_score(node_idx, 0, unary_beliefs, unary_pots, pairwise_pots)
+            score_1 = self.calculate_local_score(node_idx, 1, unary_beliefs, unary_pots, pairwise_pots)
+            if score_1 > score_0:
+                # Set the belief for the assignment
+                unary_beliefs[node_idx, 1] = 1
+                unary_beliefs[node_idx, 0] = 0
+            else:
+                # Set the belief for the assignment
+                unary_beliefs[node_idx, 1] = 0
+                unary_beliefs[node_idx, 0] = 1
         return unary_beliefs
 
     def calculate_local_score(self, node, assignment, unary_beliefs,
                               unary_potentials, pairwise_potentials):
-        '''Calculates the score of a "patch" surrounding the specified node,
+        """Calculate the score of a "patch" surrounding the specified node,
         assuming that node has the specified assignment, given the current
         beliefs for the assignments of values to the pixels in the image
 
@@ -444,16 +519,37 @@ class LinearMRF(object):
               potentials for the image, having shape (len(self.pairs), 4)
         Returns:
             (float): The score of the patch
-        '''
+        """
         score = 0.0
-        #######################
-        #IMPLEMENT THIS METHOD#
-        #######################
+        #########################
+        # IMPLEMENT THIS METHOD #
+        #########################
+        sum1 = unary_potentials[node, assignment] * unary_beliefs[node, assignment]
+        sum2 = 0
+
+        for neighbor in self.neighbors[node]:
+            if unary_beliefs[neighbor][0] == 1:
+                y_j = 0
+            else:
+                y_j = 1
+
+            if assignment == 0 and y_j == 0:
+                idx = 0
+            elif assignment == 0 and y_j == 1:
+                idx = 1
+            elif assignment == 1 and y_j == 0:
+                idx = 2
+            elif assignment == 1 and y_j == 1:
+                idx = 3
+
+            sum2 += pairwise_potentials[self.pair_inds[(node, neighbor)], idx]
+
+        score = sum1 + sum2
         return score
 
     def check_convergence(self, new_unary_beliefs, old_unary_beliefs,
                           convergence_margin):
-        '''Given two sets of unary beliefs, determine if inference has
+        """Given two sets of unary beliefs, determine if inference has
         converged.
 
         Convergence occurs when the percentage of nodes in the graph whose
@@ -468,14 +564,25 @@ class LinearMRF(object):
               This should be a number between 0 and 1
         Returns:
             (bool): whether inference has converged
-        '''
-        #######################
-        #IMPLEMENT THIS METHOD#
-        #######################
-        return None
+        """
+        #########################
+        # IMPLEMENT THIS METHOD #
+        #########################
+        num = 0
+        # Amount of nodes in the graph whose beliefs have changed
+        for idx, belief in enumerate(new_unary_beliefs):
+            if (old_unary_beliefs[idx][0] != belief[0]) or (old_unary_beliefs[idx][1] != belief[1]):
+                num += 1
+
+        # Percentage of nodes in the graph whose beliefs have changed
+        ratio = num / new_unary_beliefs.shape[0]
+        if ratio <= convergence_margin:
+            return True
+        else:
+            return False
 
     def get_pairwise_beliefs(self, unary_beliefs):
-        '''Generates the appropriate pairwise beliefs for a specified set of
+        """Generate the appropriate pairwise beliefs for a specified set of
         unary beliefs.
 
         Due to the fact that all of the unary beliefs for this inference
@@ -494,9 +601,15 @@ class LinearMRF(object):
             (np.array): The set of pairwise beliefs. This array should have
               shape (len(self.pairs), 4) and is indexed the same way as
               specified in get_pairwise_features.
-        '''
+        """
         result = np.zeros((len(self.pairs), 4))
-        #######################
-        #IMPLEMENT THIS METHOD#
-        #######################
+        #########################
+        # IMPLEMENT THIS METHOD #
+        #########################
+        for pair in self.pairs:
+            # if unary_beliefs[pair[0]][1] == 1 and unary_beliefs[pair[1]][1] == 1:
+            result[self.pair_inds[pair], 0] = unary_beliefs[pair[0]][0] * unary_beliefs[pair[1]][0]
+            result[self.pair_inds[pair], 1] = unary_beliefs[pair[0]][0] * unary_beliefs[pair[1]][1]
+            result[self.pair_inds[pair], 2] = unary_beliefs[pair[0]][1] * unary_beliefs[pair[1]][0]
+            result[self.pair_inds[pair], 3] = unary_beliefs[pair[0]][1] * unary_beliefs[pair[1]][1]
         return result
