@@ -227,7 +227,7 @@ class LinearMRF(object):
                 for each of the noisy samples. Each entry is a rank-2 tensor
                 of size (height x width, 2)
             pairwise_potentials(tf.Tensor): The pairwise potentials, which is
-                a rank-2 tensor of size (len(pairs) * 4, 1)
+                a rank-2 tensor of size (len(self.pairs), 4)
         Returns:
             (tf.Tensor): the training objective, which is a rank-0 tensor
         """
@@ -261,17 +261,26 @@ class LinearMRF(object):
         # F = tf.reduce_sum(tf.multiply(self.unary_weight, img_features))
 
         # F = tf.reduce_sum
-
-
         unary_loss = tf.reduce_sum(tf.multiply(unary_beliefs, unary_potentials))
         pairwise_loss = tf.reduce_sum(tf.multiply(pair_beliefs, pairwise_potentials))
 
         # F = tf.reduce_sum(tf.multiply(self.unary_weight, tf.convert_to_tensor(img_features, dtype=unary_potentials.dtype)) + 
             # tf.multiply(self.pairwise_weight, tf.convert_to_tensor(img_features, dtype=pairwise_potentials.dtype)))
-        F = tf.reduce_sum(tf.multiply(self.unary_weight, img_features))
+        F1 = tf.reduce_sum(tf.multiply(unary_potentials, img_features))
+
+        pairwise_features = np.zeros((len(self.pairs), 4))
+
+        for pair in self.pairs:
+            i, j = pair
+            y = int(img_features[i, 1] * 2 + img_features[j, 1])
+            x = self.pair_inds[pair]
+            pairwise_features[x, y] = 1
+
+        F2 = tf.reduce_sum(tf.multiply(pairwise_potentials, pairwise_features))
+
 
         # Compute traning object
-        obj = unary_loss + pairwise_loss - F
+        obj = unary_loss + pairwise_loss - (F1 + F2)
         return obj
 
     def train(self, original_img, noisy_samples, lr, num_epochs,
