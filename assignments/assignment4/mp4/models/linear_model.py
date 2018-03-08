@@ -4,6 +4,10 @@ import abc
 import numpy as np
 import six
 
+# - Double check that the __init__ function works with zeros and ones.
+# - Double check that your forward function output is reasonable, (e.g. weights
+# of all zeros, then the output should be 0).
+
 
 @six.add_metaclass(abc.ABCMeta)
 class LinearModel(object):
@@ -35,8 +39,15 @@ class LinearModel(object):
         self.w_decay_factor = w_decay_factor
         self.w = None
         self.x = None
-
-        pass
+        # Implementation here.
+        if w_init == 'zeros':
+            self.w = np.zeros([ndims + 1, 1])
+        elif w_init == 'ones':
+            self.w = np.ones([ndims + 1, 1])
+        elif w_init == 'uniform':
+            self.w = np.random.uniform(low=0, high=1, size=(ndims + 1, 1))
+        else:
+            print('Unknown w_init ', w_init)
 
     def forward(self, x):
         """Forward operation for linear models.
@@ -51,7 +62,9 @@ class LinearModel(object):
         Returns:
             (numpy.ndarray): Dimension of (N,1)
         """
-        pass
+        # Implementation here.
+        self.x = np.concatenate((x, np.ones((x.shape[0], 1))), axis=1)
+        f = self.x.dot(self.w)
 
         return f
 

@@ -1,4 +1,4 @@
-"""Main function for train, eval, and test."""
+"""Main function for train, eval, and test. This file will not be graded."""
 
 from __future__ import print_function
 from __future__ import absolute_import
@@ -20,12 +20,13 @@ flags.DEFINE_integer('num_steps', 5000, 'Number of update steps to run.')
 flags.DEFINE_string(
     'feature_type',
     'default',
-    'Feature type, supports [raw, deafult, custom]')
-flags.DEFINE_string('opt_method', 'iter', 'Supports ["iter", "qp"]')
+    'Feature type, supports [raw, default, custom]')
+flags.DEFINE_string('opt_method', 'qp', 'Supports ["iter", "qp"]')
 
 
 def main(_):
     """High level pipeline.
+
     This script performs the trainsing, evaling and testing state of the model.
     """
     learning_rate = FLAGS.learning_rate
@@ -41,7 +42,7 @@ def main(_):
     # Initialize model.
     ndim = train_set['image'][0].shape[0]
     model = SupportVectorMachine(
-        ndim, 'zeros', w_decay_factor=FLAGS.w_decay_factor)
+        ndim, 'ones', w_decay_factor=FLAGS.w_decay_factor)
 
     # Train model.
     if opt_method == 'iter':
@@ -51,7 +52,7 @@ def main(_):
     else:
         # Compute closed form solution.
         train_model_qp(train_set, model)
-        print('Finished QP Solver')
+        print('Finished QP Solver.')
 
     train_loss, train_acc = eval_model(train_set, model)
     print("Train loss: %s" % train_loss)
@@ -69,7 +70,7 @@ def main(_):
     test_set = preprocess_data(test_set, feature_type)
     test_loss, test_acc = eval_model(test_set, model)
     print("Test loss: %s" % test_loss)
-    print("Test ac: %s" % test_acc)
+    print("Test acc: %s" % test_acc)
 
 
 if __name__ == '__main__':

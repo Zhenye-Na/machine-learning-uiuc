@@ -1,4 +1,4 @@
-"""Simple unit tests for students."""
+"""Simple unit tests for students. (This file will not be graded.)"""
 
 import unittest
 import numpy as np
