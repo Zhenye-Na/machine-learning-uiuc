@@ -89,9 +89,9 @@ class TestSklearn(unittest.TestCase):
     def test_grad(self):
         my_cs = MulticlassSVM('crammer-singer')
         norm_diff = np.linalg.norm(my_cs.grad_student(self.W, self.X, self.y) -
-        np.array([[-2.30447458, -0.94740057],
-                  [ 2.62578591,  1.11242235],
-                  [ 0.16124486,  1.71850243]]))
+                                   np.array([[-2.30447458, -0.94740057],
+                                             [2.62578591, 1.11242235],
+                                             [0.16124486, 1.71850243]]))
         self.assertTrue(norm_diff < 1e-6)
 
     def test_loss(self):
@@ -99,6 +99,7 @@ class TestSklearn(unittest.TestCase):
         loss_diff = abs(my_cs.loss_student(self.W, self.X, self.y)
                         - 7.441854144192854)
         self.assertTrue(loss_diff < 1e-6)
+
 
 if __name__ == '__main__':
     unittest.main()
