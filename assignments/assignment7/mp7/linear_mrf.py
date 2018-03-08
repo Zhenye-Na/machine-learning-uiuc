@@ -148,13 +148,6 @@ class LinearMRF(object):
         #########################
         # IMPLEMENT THIS METHOD #
         #########################
-        # Initialize f_pairwise
-        # zero = np.zeros((len(self.pairs), 1))
-        # one = np.ones((len(self.pairs), 1))
-        # f_pairwise = np.ones((len(self.pairs), 1))
-        # f_pairwise = np.hstack((f_pairwise, zero))
-        # f_pairwise = np.hstack((f_pairwise, zero))
-        # f_pairwise = np.hstack((f_pairwise, one))
         return np.array([[1, 0, 0, 1], ] * len(self.pairs))
 
     def calculate_unary_potentials(self, unary_features):
@@ -234,38 +227,9 @@ class LinearMRF(object):
         #########################
         # IMPLEMENT THIS METHOD #
         #########################
-
-        # Compute unary_loss
-        # unary_loss = tf.reduce_sum(tf.multiply(unary_beliefs, unary_potentials))
-
-        # for num in range(len(unary_beliefs)):
-        #     # unary_loss += tf.reduce_sum(tf.multiply(unary_beliefs[i][:, 0], unary_potentials[i][:,0]) + 
-        #     #     tf.multiply(unary_beliefs[i][:, 1], unary_potentials[i][:, 1]), 0)
-        #     for d in range(unary_beliefs[0].shape[1]):
-        #         unary_loss += tf.reduce_sum(tf.multiply(unary_beliefs[num][:, d], unary_potentials[num][:,d]))
-
-        # Compute unary_loss
-        # pairwise_loss = tf.reduce_sum(tf.multiply(pair_beliefs, pairwise_potentials))
-
-        # for i in range(len(pair_beliefs)):
-        #     # pairwise_loss += tf.reduce_sum(tf.multiply(pair_beliefs[i][:, 0], pairwise_potentials[i][:,0]) + 
-        #     #     tf.multiply(pair_beliefs[i][:, 1], pairwise_potentials[i][:, 1]) + 
-        #     #         tf.multiply(pair_beliefs[i][:, 2], pairwise_potentials[i][:, 2]) + 
-        #     #             tf.multiply(pair_beliefs[i][:, 3], pairwise_potentials[i][:, 3]), 0)
-        #     for d in range(pair_beliefs[0].shape[1]):
-        #         unary_loss += tf.reduce_sum(tf.multiply(pair_beliefs[num][:, d], pairwise_potentials[:, d]))
-
-        # Compute F
-        # F = tf.reduce_sum(tf.multiply(self.unary_weight, tf.convert_to_tensor(img_features, dtype=unary_potentials.dtype)) + 
-            # tf.multiply(self.pairwise_weight, tf.convert_to_tensor(img_features, dtype=pairwise_potentials.dtype)))
-        # F = tf.reduce_sum(tf.multiply(self.unary_weight, img_features))
-
-        # F = tf.reduce_sum
         unary_loss = tf.reduce_sum(tf.multiply(unary_beliefs, unary_potentials))
         pairwise_loss = tf.reduce_sum(tf.multiply(pair_beliefs, pairwise_potentials))
 
-        # F = tf.reduce_sum(tf.multiply(self.unary_weight, tf.convert_to_tensor(img_features, dtype=unary_potentials.dtype)) + 
-            # tf.multiply(self.pairwise_weight, tf.convert_to_tensor(img_features, dtype=pairwise_potentials.dtype)))
         F1 = tf.reduce_sum(tf.multiply(unary_potentials, img_features))
 
         pairwise_features = np.zeros((len(self.pairs), 4))
@@ -277,7 +241,6 @@ class LinearMRF(object):
             pairwise_features[x, y] = 1
 
         F2 = tf.reduce_sum(tf.multiply(pairwise_potentials, pairwise_features))
-
 
         # Compute traning object
         obj = unary_loss + pairwise_loss - (F1 + F2)
