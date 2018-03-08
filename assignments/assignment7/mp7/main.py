@@ -13,7 +13,7 @@ from data_tools import load_dataset, plot_image
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 flags.DEFINE_float('learning_rate', 0.01, 'Initial learning rate.')
-flags.DEFINE_integer('num_epochs', 10, 'Number of update steps to run.')
+flags.DEFINE_integer('num_epochs', 2, 'Number of update steps to run.')
 flags.DEFINE_float('convergence_margin', 0.01,
                    'Margin of convergence for inference')
 flags.DEFINE_string('input_file_path', 'data/circle.png', 'Original Image.')

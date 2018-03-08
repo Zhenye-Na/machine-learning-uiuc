@@ -243,7 +243,7 @@ class LinearMRF(object):
         F2 = tf.reduce_sum(tf.multiply(pairwise_potentials, pairwise_features))
 
         # Compute traning object
-        obj = unary_loss + pairwise_loss - (F1 + F2)
+        obj = unary_loss + pairwise_loss - (F1 + len(unary_beliefs)*F2)
         return obj
 
     def train(self, original_img, noisy_samples, lr, num_epochs,
