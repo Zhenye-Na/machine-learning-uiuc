@@ -227,8 +227,14 @@ class LinearMRF(object):
         #########################
         # IMPLEMENT THIS METHOD #
         #########################
-        unary_loss = tf.reduce_sum(tf.multiply(unary_beliefs, unary_potentials))
-        pairwise_loss = tf.reduce_sum(tf.multiply(pair_beliefs, pairwise_potentials))
+        unary_loss = tf.reduce_sum(
+            tf.multiply(
+                unary_beliefs,
+                unary_potentials))
+        pairwise_loss = tf.reduce_sum(
+            tf.multiply(
+                pair_beliefs,
+                pairwise_potentials))
 
         F1 = tf.reduce_sum(tf.multiply(unary_potentials, img_features))
 
@@ -243,7 +249,7 @@ class LinearMRF(object):
         F2 = tf.reduce_sum(tf.multiply(pairwise_potentials, pairwise_features))
 
         # Compute traning object
-        obj = unary_loss + pairwise_loss - (F1 + len(unary_beliefs)*F2)
+        obj = unary_loss + pairwise_loss - (F1 + len(unary_beliefs) * F2)
         return obj
 
     def train(self, original_img, noisy_samples, lr, num_epochs,
@@ -263,10 +269,10 @@ class LinearMRF(object):
         unary_belief_placeholders = []
         pairwise_belief_placeholders = []
         for i in range(len(noisy_samples)):
-            unary_belief_placeholders.append(tf.placeholder(tf.float32,
-                                             [self.height * self.width, 2]))
-            pairwise_belief_placeholders.append(tf.placeholder(tf.float32,
-                                                [len(self.pairs), 4]))
+            unary_belief_placeholders.append(tf.placeholder(
+                tf.float32, [self.height * self.width, 2]))
+            pairwise_belief_placeholders.append(
+                tf.placeholder(tf.float32, [len(self.pairs), 4]))
 
         # Compute features for original image and noisy samples
         img_features = self.get_unary_features(original_img)
@@ -286,7 +292,7 @@ class LinearMRF(object):
         unary_potentials = [self.calculate_unary_potentials(feat)
                             for feat in noisy_features]
         pairwise_potentials = self.calculate_pairwise_potentials(
-                self.pairwise_features)
+            self.pairwise_features)
 
         train_obj = self.build_training_obj(img_features,
                                             unary_belief_placeholders,
@@ -310,13 +316,13 @@ class LinearMRF(object):
 
                 # Second: Run Inference
                 unary_beliefs, pairwise_beliefs = self.run_greedy_inference(
-                        unary_beliefs, unary_pot_result, pairwise_pot_result,
-                        convergence_margin)
+                    unary_beliefs, unary_pot_result, pairwise_pot_result,
+                    convergence_margin)
 
                 score = 0
                 for unary_belief in unary_beliefs:
                     score += np.sum(unary_beliefs != img_features) /\
-                            (len(unary_beliefs) * 2)
+                        (len(unary_beliefs) * 2)
                 score /= len(unary_beliefs)
                 print("CURRENT SCORE: ", score)
                 print("WEIGHTS: ")
@@ -355,7 +361,7 @@ class LinearMRF(object):
         unary_potentials = [self.calculate_unary_potentials(feat)
                             for feat in noisy_features]
         pairwise_potentials = self.calculate_pairwise_potentials(
-                self.pairwise_features)
+            self.pairwise_features)
 
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
@@ -367,8 +373,8 @@ class LinearMRF(object):
             unary_pot_result = results[1:]
 
         unary_beliefs, pairwise_beliefs = self.run_greedy_inference(
-                unary_beliefs, unary_pot_result, pairwise_pot_result,
-                convergence_margin)
+            unary_beliefs, unary_pot_result, pairwise_pot_result,
+            convergence_margin)
 
         denoised_imgs = [self.beliefs2img(unary_belief)
                          for unary_belief in unary_beliefs]
@@ -455,8 +461,10 @@ class LinearMRF(object):
 
         for node_idx in random_idx:
             # Calculate the scores
-            score_0 = self.calculate_local_score(node_idx, 0, unary_beliefs, unary_pots, pairwise_pots)
-            score_1 = self.calculate_local_score(node_idx, 1, unary_beliefs, unary_pots, pairwise_pots)
+            score_0 = self.calculate_local_score(
+                node_idx, 0, unary_beliefs, unary_pots, pairwise_pots)
+            score_1 = self.calculate_local_score(
+                node_idx, 1, unary_beliefs, unary_pots, pairwise_pots)
             if score_1 > score_0:
                 # Set the belief for the assignment
                 unary_beliefs[node_idx, 1] = 1
@@ -543,7 +551,8 @@ class LinearMRF(object):
         num = 0
         # Amount of nodes in the graph whose beliefs have changed
         for idx, belief in enumerate(new_unary_beliefs):
-            if (old_unary_beliefs[idx][0] != belief[0]) or (old_unary_beliefs[idx][1] != belief[1]):
+            if (old_unary_beliefs[idx][0] != belief[0]) or (
+                    old_unary_beliefs[idx][1] != belief[1]):
                 num += 1
 
         # Percentage of nodes in the graph whose beliefs have changed
@@ -579,9 +588,14 @@ class LinearMRF(object):
         # IMPLEMENT THIS METHOD #
         #########################
         for pair in self.pairs:
-            # if unary_beliefs[pair[0]][1] == 1 and unary_beliefs[pair[1]][1] == 1:
-            result[self.pair_inds[pair], 0] = unary_beliefs[pair[0]][0] * unary_beliefs[pair[1]][0]
-            result[self.pair_inds[pair], 1] = unary_beliefs[pair[0]][0] * unary_beliefs[pair[1]][1]
-            result[self.pair_inds[pair], 2] = unary_beliefs[pair[0]][1] * unary_beliefs[pair[1]][0]
-            result[self.pair_inds[pair], 3] = unary_beliefs[pair[0]][1] * unary_beliefs[pair[1]][1]
+            # if unary_beliefs[pair[0]][1] == 1 and unary_beliefs[pair[1]][1]
+            # == 1:
+            result[self.pair_inds[pair], 0] = unary_beliefs[pair[0]
+                                                            ][0] * unary_beliefs[pair[1]][0]
+            result[self.pair_inds[pair], 1] = unary_beliefs[pair[0]
+                                                            ][0] * unary_beliefs[pair[1]][1]
+            result[self.pair_inds[pair], 2] = unary_beliefs[pair[0]
+                                                            ][1] * unary_beliefs[pair[1]][0]
+            result[self.pair_inds[pair], 3] = unary_beliefs[pair[0]
+                                                            ][1] * unary_beliefs[pair[1]][1]
         return result

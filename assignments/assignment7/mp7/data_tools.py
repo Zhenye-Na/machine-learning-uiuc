@@ -7,6 +7,7 @@ import pylab as pl
 import matplotlib
 matplotlib.use('Agg')
 
+
 def load_dataset(input_file_path, num_samples):
     """
     Generates a dataset by loading an image and creating the specified number

@@ -19,10 +19,11 @@ class ModelTests(unittest.TestCase):
         result = self.model.get_pairwise_features()
         self.assertEqual(result.shape, (7, 4))
 
+
 class BeliefTests(unittest.TestCase):
     def setUp(self):
         self.model = LinearMRF(1, 2)
-    
+
     def test_belief_convergence(self):
         new_beliefs = np.array([[0, 1],
                                 [0, 1]])
@@ -37,10 +38,11 @@ class BeliefTests(unittest.TestCase):
         result = self.model.get_pairwise_beliefs(beliefs)
         self.assertEqual(result.shape, (1, 4))
 
+
 class InferenceTests(unittest.TestCase):
     def setUp(self):
         self.model = LinearMRF(1, 2)
-    
+
     def test_inf(self):
         unary_beliefs = np.array([[0, 1],
                                   [0, 1]])
@@ -53,10 +55,11 @@ class InferenceTests(unittest.TestCase):
                                           pairwise_potentials)
         np.testing.assert_array_equal(correct, result)
 
+
 class LearningTests(unittest.TestCase):
     def setUp(self):
         self.model = LinearMRF(1, 2)
- 
+
     def test_learning_obj(self):
         img_features = np.array([[1, 0], [1, 0]])
         unary_beliefs = [tf.constant([[1, 0], [1, 0]])]
@@ -71,6 +74,7 @@ class LearningTests(unittest.TestCase):
             sess.run(tf.global_variables_initializer())
             result_val = sess.run(result)
         self.assertEqual(correct, result_val)
+
 
 if __name__ == '__main__':
     unittest.main()
