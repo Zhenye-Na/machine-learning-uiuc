@@ -1,0 +1,83 @@
+\documentclass[oneside,11pt,letter]{article}
+
+% General include (DO NOT MODIFY)
+\include{cs446include}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%CHANGE
+%.   to booklet to print the problems only
+%
+%    to both to print problems and solutions
+%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\type}{booklet}
+%\newcommand{\type}{both}
+
+% Custom adjustments (CHANGE THIS FILE FOR ADDITIONAL ADJUSTMENTS)
+\include{cs446custom}
+
+%************************************************************************
+%                                                                       *
+%            End of preamble and beginning of text.                     *
+%                                                                       *
+%************************************************************************
+
+\begin{document}
+%------------------------- Title Page ----------------------------------
+\thispagestyle{empty}
+\baselineskip2.5ex
+{\bf University of Illinois}
+\hfill
+Spring 2018
+
+{\Large
+\begin{center}
+{\sf CS\,446: Machine Learning}\\ Homework\\
+\end{center}
+}
+{\large
+\begin{center}
+{\color{red}Due on Tuesday, April 3, 2018, 11:59 AM Central Time}
+\end{center}
+}
+
+\ifthenelse{\equal{\type}{booklet}}{}{}
+
+\begin{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%  BEGINNING OF PROBLEMS LIST
+
+%\input{regression}
+%\bookletpage
+%\input{LinLogReg}
+%\bookletpage
+%\input{bin_class}
+%\bookletpage
+%\input{svm}
+%\bookletpage
+%\input{svm2}
+%\bookletpage
+%\input{Backprop}
+%\bookletpage
+%\input{MRF}
+%\bookletpage
+\input{GMMkMeans}
+%\bookletpage
+%\input{VAE}
+%\bookletpage
+%\input{VAE2}
+%\bookletpage
+%\input{GAN}
+%\bookletpage
+%\input{GAN2}
+%\bookletpage
+%\input{MDP}
+%\bookletpage
+%\input{QLearn}
+
+%%%%%%%%%%%% END OF PROBLEMS LIST
+
+\end{enumerate}
+\end{document}
+
