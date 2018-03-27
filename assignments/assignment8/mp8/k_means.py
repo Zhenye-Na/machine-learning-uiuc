@@ -2,8 +2,6 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 import sys
-from collections import defaultdict
-
 
 '''
 In this problem you write your own K-Means
@@ -13,125 +11,130 @@ Your code should return a 2d array containing
 the centers.
 
 '''
-# Comfigure the path to data
-# print(sys.path)
-data_dir = 'data/data/iris.data'
-# sys.path.insert(0, data_dir)
-# print(sys.path)
+# Configure the path to data
+data_dir = '/Users/macbookpro/Desktop/cs446/assignments/assignment8/mp8/data/data/iris.data'
+# /Users/macbookpro/Desktop/cs446/assignments/assignment8/mp8/data/data
 
 # Import the dataset
 df = pd.read_table(data_dir, delimiter=',')
-# print(df)
 X = df[['V1', 'V2', 'V3', 'V4']].as_matrix()
-# print(X)
-# Make 3  clusters
+# Make 3 clusters
 k = 3
+
 # Initial Centroids
-C = [[2., 0., 3., 4.], [1., 2., 1., 3.], [0., 2., 1., 0.]]
+C = [[2., 0., 3., 4.],
+     [1., 2., 1., 3.],
+     [0., 2., 1., 0.]]
 C = np.array(C)
-# print(type(C[0]))
+
 print("Initial Centers: ")
 print(C)
 
 
-def distance(data, centers):
-    """
-    Compute distance of data points and centers
+def distance(data_point, center):
+    """Compute distance between data point and corresponding center.
 
     Args:
-        series of data points.
-        data: data points
-        centers: center cordinates
-    Return:
-        dataset
+        data_point(list): single data point.
+        center(list): corresponding center.
+    Returns:
+        dist(double): distance between data point and corresponding center.
     """
-    dimensions = len(data)
-
+    dimensions = len(data_point)
     dist = 0
-    for dimension in range(dimensions):
-        difference_sq = (data[dimension] - centers[dimension]) ** 2
-        dist += difference_sq
-    return dist ** 0.5
+    for dim in range(dimensions):
+        dist += (data_point[dim] - center[dim]) ** 2
+    return (dist ** 0.5)
 
 
-def assign_points(data_points, centers):
+def assign_cluster(data, centers):
+    """Assign cluster index to each of data point.
+
+    Args:
+        data(np.ndarray):
+        centers(np.ndarray):
+    Returns:
+        index(list):
     """
-    Given a data set and a list of points betweeen other points,
-    assign each point to an index that corresponds to the index
-    of the center point on it's proximity to that point. 
-    Return a an array of indexes of centers that correspond to
-    an index in the data set; that is, if there are N points
-    in `data_set` the list we return will have N elements. Also
-    If there are Y points in `centers` there will be Y unique
-    possible values within the returned list.
-    """
-    assignments = []
-    for point in data_points:
-        shortest = ()  # positive infinity
-        shortest_index = 0
-        for i in range(len(centers)):
-            val = distance(point, centers[i])
-            if val < shortest:
-                shortest = val
-                shortest_index = i
-        assignments.append(shortest_index)
-    return assignments
+    index = []
+    num_center = centers.shape[0]
 
-def update_centers(data_set, assignments):
-    """
-    Accepts a dataset and a list of assignments; the indexes 
-    of both lists correspond to each other.
-    Compute the center for each of the assigned groups.
-    Return `k` centers where `k` is the number of unique assignments.
-    """
-    new_means = defaultdict(list)
-    centers = []
-    for assignment, point in zip(assignments, data_set):
-        new_means[assignment].append(point)
-        
-    for points in new_means.itervalues():
-        centers.append(point_avg(points))
-
-    return centers
+    for point in data:
+        dist = []
+        for i in range(num_center):
+            dist.append(distance(point, centers[i]))
+        index.append(dist.index(min(dist)))
+    return index
 
 
-def assign_points(data_points, centers):
-    """
-    Given a data set and a list of points betweeen other points,
-    assign each point to an index that corresponds to the index
-    of the center point on it's proximity to that point. 
-    Return a an array of indexes of centers that correspond to
-    an index in the data set; that is, if there are N points
-    in `data_set` the list we return will have N elements. Also
-    If there are Y points in `centers` there will be Y unique
-    possible values within the returned list.
-    """
-    assignments = []
-    for point in data_points:
-        shortest = ()  # positive infinity
-        shortest_index = 0
-        for i in range(len(centers)):
-            val = distance(point, centers[i])
-            if val < shortest:
-                shortest = val
-                shortest_index = i
-        assignments.append(shortest_index)
-    return assignments
+def recompute_center(points):
+    """Re-compute center for data points in same cluster.
 
-def k_means(X, C):
+    Args:
+        points(list):
+    Returns:
+        center(list)
+    """
+    points = np.array(points)
+    points = np.reshape(points, (points.shape[0], X.shape[1]))
+    num = points.shape[0]
+    dimensions = points.shape[1]
+    center = []
+
+    for dim in range(dimensions):
+        center.append(sum(points[:, dim]) / num)
+    return center
+
+
+def update_center(data, old_index):
+    """Update centers for data points.
+
+    Args:
+        data(np.ndarray): data points.
+        old_index(list): The previous/current index.
+    Returns:
+        new_centers(np.ndarray): new centers after updating.
+    """
+    new_centers = []
+    points = []
+    for idx_centroid in range(k):
+        for row in range(data.shape[0]):
+            if old_index[row] == idx_centroid:
+                points.append(data[row, :])
+
+        new_centers.append(recompute_center(points))
+        points = []
+
+    new_centers = np.array(new_centers)
+    return new_centers
+
+
+def k_means(C):
+    """Perform K-Means Algorithm on dataset.
+
+    Args:
+        C(np.ndarray): initial centers.
+    """
     # Write your code here!
-    assignments = assign_points(X, C)
-    old_assignments = np.zeros_like(C[0])
-    print(old_assignments)
-    print(assignments)
-    # for point in assignments:
+    # Get the initial cluster of data points
+    C = np.array(C)
+    indexofcluster = assign_cluster(X, C)
+    old_dist = 0
+    i = 0
+    while (True):
+        new_centers = update_center(X, indexofcluster)
+
+        new_indexofcluster = assign_cluster(X, new_centers)
+
+        dist = 0
+        for i in range(X.shape[0]):
+            dist += distance(X[i], new_centers[new_indexofcluster[i]])
+        if dist - old_dist < 10e-3:
+            break
+        else:
+            old_dist = dist
+    return new_centers
 
 
-    while assignments != old_assignments:
-        new_centers = update_centers(X, assignments)
-        old_assignments = assignments
-        assignments = assign_points(X, new_centers)
-    return assignments
-
-center = k_means(X, C)
-print(center)
+new_centers = k_means(C)
+print(new_centers)
