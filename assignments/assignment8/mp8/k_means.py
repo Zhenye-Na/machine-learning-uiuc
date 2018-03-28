@@ -12,7 +12,7 @@ the centers.
 
 '''
 # Configure the path to data
-data_dir = '/Users/macbookpro/Desktop/cs446/assignments/assignment8/mp8/data/data/iris.data'
+data_dir = 'data/data/iris.data'
 # /Users/macbookpro/Desktop/cs446/assignments/assignment8/mp8/data/data
 
 # Import the dataset
@@ -40,21 +40,17 @@ def distance(data_point, center):
     Returns:
         dist(double): distance between data point and corresponding center.
     """
-    dimensions = len(data_point)
-    dist = 0
-    for dim in range(dimensions):
-        dist += (data_point[dim] - center[dim]) ** 2
-    return (dist ** 0.5)
+    return np.linalg.norm(data_point - center)
 
 
 def assign_cluster(data, centers):
     """Assign cluster index to each of data point.
 
     Args:
-        data(np.ndarray):
-        centers(np.ndarray):
+        data(np.ndarray): data points
+        centers(np.ndarray): centers
     Returns:
-        index(list):
+        index(list): index of which cluster each of data points belongs to
     """
     index = []
     num_center = centers.shape[0]
@@ -63,30 +59,11 @@ def assign_cluster(data, centers):
         dist = []
         for i in range(num_center):
             dist.append(distance(point, centers[i]))
-        index.append(dist.index(min(dist)))
+        index.append(np.argmin(dist))
     return index
 
 
-def recompute_center(points):
-    """Re-compute center for data points in same cluster.
-
-    Args:
-        points(list):
-    Returns:
-        center(list)
-    """
-    points = np.array(points)
-    points = np.reshape(points, (points.shape[0], X.shape[1]))
-    num = points.shape[0]
-    dimensions = points.shape[1]
-    center = []
-
-    for dim in range(dimensions):
-        center.append(sum(points[:, dim]) / num)
-    return center
-
-
-def update_center(data, old_index):
+def update_center(X, indx):
     """Update centers for data points.
 
     Args:
@@ -95,18 +72,12 @@ def update_center(data, old_index):
     Returns:
         new_centers(np.ndarray): new centers after updating.
     """
-    new_centers = []
-    points = []
-    for idx_centroid in range(k):
-        for row in range(data.shape[0]):
-            if old_index[row] == idx_centroid:
-                points.append(data[row, :])
-
-        new_centers.append(recompute_center(points))
-        points = []
-
-    new_centers = np.array(new_centers)
-    return new_centers
+    newCenters = []
+    for clusterNumber in range(0, k):
+        Cluster = X[[i for i, find in enumerate(indx) if find == clusterNumber]]
+        centroid = Cluster.mean(axis=0)
+        newCenters.append(centroid)
+    return np.array(newCenters)
 
 
 def k_means(C):
@@ -120,21 +91,20 @@ def k_means(C):
     C = np.array(C)
     indexofcluster = assign_cluster(X, C)
     old_dist = 0
-    i = 0
     while (True):
         new_centers = update_center(X, indexofcluster)
-
         new_indexofcluster = assign_cluster(X, new_centers)
 
         dist = 0
         for i in range(X.shape[0]):
             dist += distance(X[i], new_centers[new_indexofcluster[i]])
-        if dist - old_dist < 10e-3:
+        if abs(dist - old_dist) < 10e-3:
             break
         else:
             old_dist = dist
+            indexofcluster = new_indexofcluster
     return new_centers
 
-
 new_centers = k_means(C)
+print("New centers: ")
 print(new_centers)
