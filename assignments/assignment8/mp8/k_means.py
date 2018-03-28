@@ -13,11 +13,11 @@ the centers.
 '''
 # Configure the path to data
 data_dir = 'data/data/iris.data'
-# /Users/macbookpro/Desktop/cs446/assignments/assignment8/mp8/data/data
 
 # Import the dataset
 df = pd.read_table(data_dir, delimiter=',')
 X = df[['V1', 'V2', 'V3', 'V4']].as_matrix()
+
 # Make 3 clusters
 k = 3
 
@@ -38,7 +38,7 @@ def distance(data_point, center):
         data_point(list): single data point.
         center(list): corresponding center.
     Returns:
-        dist(double): distance between data point and corresponding center.
+        distance between data point and corresponding center.
     """
     return np.linalg.norm(data_point - center)
 
