@@ -1,4 +1,4 @@
-# CS446 Machine Learning
+# [CS446 Machine Learning](https://courses.engr.illinois.edu/cs446/sp2018/_site/index.html)
 ## Course Information:
 The goal of Machine Learning is to build computer systems that can adapt and learn from data. In this course we will cover three main areas, (1) discriminative models, (2) generative models, and (3) reinforcement learning models.In particular we will cover the following: 
 
