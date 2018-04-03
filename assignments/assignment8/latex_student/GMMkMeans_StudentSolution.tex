@@ -16,7 +16,15 @@ K-Means is un-supervised method.
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{0cm}
-$r_{ik} \in \{0,1 \}$ This will make any data point $x_{i}$ belong to or not belong to centroid $\mu_{k}$ 
+$r_{ik} \in \{0,1 \}$ This will make any data point $x_{i}$ belong to ($r_{ik} = 1$) or not belong to ($r_{ik} = 0$) centroid $\mu_{k}$ 
+
+\[
+r_{ik}= 
+\begin{cases}
+1, & \text{if } ||x_{i} - \mu_{k}||^2 < ||x_{i} - \mu_{l}||^2, \forall l \neq k\\
+0, & \text{otherwise}
+\end{cases}
+\]
 
 }
 
@@ -27,7 +35,13 @@ $r_{ik} \in \{0,1 \}$ This will make any data point $x_{i}$ belong to or not bel
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{0cm}
-$r_{ik} \in [0,1]$ This will make each line of matrix $R$ a probability vector of data point $x_{i}$ 
+$r_{ik} \in [0,1]$ This will make $i^{th}$ line of matrix $R$ the probability vector of data point $x_{i}$ considering a Softmax Function.
+
+$$
+r_{ik} = \frac{e^{- \beta ||x_{i} - \mu_{k}||^{2}}}{\sum\limits_{l=1}^{k}e^{- \beta ||x_{i} - \mu_{l}||^{2}}}
+$$
+where the parameter $\beta > 0$ is called stiffness parameter.
+
 }
 
 \newcommand{\GMMkMeansStudSolD}{
@@ -37,7 +51,7 @@ $r_{ik} \in [0,1]$ This will make each line of matrix $R$ a probability vector o
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \vspace{0cm}
-The number of clusters should be two because when number of clusters equals to two, it is the elbow of the plot.
+The number of clusters should be 5 because it is the elbow of the plot.
 
 }
 
