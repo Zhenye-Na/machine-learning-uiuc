@@ -1,0 +1,92 @@
+% !TEX root = exam.tex
+\ifthenelse{\equal{\type}{booklet}}{
+\input{HW9_StudentSolution} %The students have to fill this file to print the solution
+}{
+\input{GMMkMeans_OurSolution} %This file will not be provided to students since it contains the solution
+}
+
+% Problem Explanation:
+% - first argument is the number of points
+% - second argument is the title and the text
+\examproblem{16}{Gaussian Mixture Models \& EM\\
+Consider a Gaussian mixture model with $K$ components ($k\in\{1, \ldots, K\}$), each having mean $\mu_k$, variance $\sigma_k^2$, and mixture weight $\pi_k$. All these are parameters to be learned, and we subsume them in the set $\theta$. Further, we are given a dataset $X = \{x_i\}$, where $x_i \in \mathbb{R}$. We also use $Z = \{z_{i}\}$ to denote the latent variables, such that $z_{i} = k$ implies that $x_i$ is generated from the $k^{th}$ Gaussian.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%  BEGINNING OF SUBPROBLEMS LIST
+
+\begin{enumerate}
+
+ % Subproblem description
+\examproblempart{What is the log-likelihood of the data $\log p(X; \theta)$ according to the Gaussian Mixture Model? (use $\mu_k$, $\sigma_k$, $\pi_k$, $K$, $x_i$, and $X$). Don't use any abbreviations. \\}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GMMkMeansStudSolA}
+
+ \solution{\GMMkMeansSolA}
+ \end{minipage}
+ }
+
+  % Subproblem description
+\examproblempart{For learning $\theta$ using the EM algorithm, we need the conditional distribution of the latent variables $Z$ given the current estimate of the parameters $\theta^{(t)}$ (we will use the superscript ($t$) for parameter estimates at step $t$). What is the posterior probability $p(z_{i} = k |x_i; \theta^{(t)})$? To simplify, wherever possible, use $\mathcal{N}(x_i | \mu_k, \sigma_k)$ to denote a Gaussian distribution over $x_i\in\mathbb{R}$ having mean $\mu_k$ and variance $\sigma_k^2$.}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GMMkMeansStudSolD}
+
+ \solution{\GMMkMeansSolB}
+ \end{minipage}
+ }
+
+% Subproblem description
+ \examproblempart{Find $\bE_{z_i| x_i; \theta^{(t)}}[\log p(x_i, z_i; \theta)]$. Denote $p(z_i = k| x_i; \theta^{(t)})$ as $z_{ik}$, and use all previous notation simplifications.}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GMMkMeansStudSolC}
+
+ \solution{\GMMkMeansSolC}
+ \end{minipage}
+ }
+
+% Subproblem description
+\examproblempart{$\theta^{(t+1)}$ is obtained as the maximizer of $\sum_{i=1}^N \bE_{z_i| x_i; \theta^{(t)}}[\log p(x_i, z_i; \theta)]$. Find $\mu_k^{(t+1)}$, $\pi_k^{(t+1)}$, and $\sigma_k^{(t+1)}$, by using your answer to the previous question.}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GMMkMeansStudSolD}
+
+ \solution{\GMMkMeansSolD}
+ \end{minipage}
+ }
+
+ \examproblempart{How are kMeans and Gaussian Mixture Model related? (There are three conditions)}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GMMkMeansStudSolE}
+
+ \solution{\GMMkMeansSolE}
+ \end{minipage}
+ }
+
+
+  %%%%%%%%%%%% END OF SUBPROBLEMS LIST
+
+ \end{enumerate}
