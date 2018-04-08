@@ -5,11 +5,14 @@ from scipy.stats import multivariate_normal
 
 
 class GaussianMixtureModel(object):
-    """Gaussian Mixture Model"""
+    """Gaussian Mixture Model."""
+
     def __init__(self, n_dims, n_components=1,
                  max_iter=10,
                  reg_covar=1e-6):
         """
+        Gaussian Mixture Model init funtion.
+
         Args:
             n_dims: The dimension of the feature.
             n_components: Number of Gaussians in the GMM.
@@ -23,16 +26,20 @@ class GaussianMixtureModel(object):
         self._reg_covar = reg_covar
 
         # Randomly Initialize model parameters
-        self._mu = None  # np.array of size (n_components, n_dims)
+        # np.array of size (n_components, n_dims)
+        self._mu = np.random.rand(self._n_components, self._n_dims)
 
         # Initialized with uniform distribution.
-        self._pi = None  # np.array of size (n_components, 1)
+        # np.array of size (n_components, 1)
+        self._pi = np.random.uniform(size=(self._n_components, 1))
 
         # Initialized with identity.
-        self._sigma = None  # np.array of size (n_components, n_dims, n_dims)
+        # np.array of size (n_components, n_dims, n_dims)
+        i = np.eye(self._n_dims)
+        self._sigma = np.repeat(i[np.newaxis, :, :], self._n_components, axis=0)
 
     def fit(self, x):
-        """Runs EM steps.
+        """Run EM steps.
 
         Runs EM steps for max_iter number of steps.
 
@@ -67,7 +74,7 @@ class GaussianMixtureModel(object):
         pass
 
     def get_conditional(self, x):
-        """Computes the conditional probability.
+        """Compute the conditional probability.
 
         p(x^(i)|z_ik=1)
 
@@ -83,7 +90,7 @@ class GaussianMixtureModel(object):
         return np.array(ret)
 
     def get_marginals(self, x):
-        """Computes the marginal probability.
+        """Compute the marginal probability.
 
         p(x^(i)|pi, mu, sigma)
 
@@ -95,7 +102,7 @@ class GaussianMixtureModel(object):
         return None
 
     def get_posterior(self, x):
-        """Computes the posterior probability.
+        """Compute the posterior probability.
 
         p(z_{ik}=1|x^(i))
 
@@ -110,6 +117,7 @@ class GaussianMixtureModel(object):
 
     def _multivariate_gaussian(self, x, mu_k, sigma_k):
         """Multivariate Gaussian, implemented for you.
+
         Args:
             x(numpy.ndarray): Array containing the features of dimension (N,
                 ndims)
@@ -121,6 +129,7 @@ class GaussianMixtureModel(object):
 
     def supervised_fit(self, x, y):
         """Assign each cluster with a label through counting.
+
         For each cluster, find the most common digit using the provided (x,y)
         and store it in self.cluster_label_map.
         self.cluster_label_map should be a list of length n_components,
@@ -132,12 +141,12 @@ class GaussianMixtureModel(object):
                 ndims).
             y(numpy.ndarray): Array containing the label of dimension (N,)
         """
-
         self.cluster_label_map = []
         pass
 
     def supervised_predict(self, x):
         """Predict a label for each example in x.
+
         Find the get the cluster assignment for each x, then use
         self.cluster_label_map to map to the corresponding digit.
         Args:
@@ -147,7 +156,6 @@ class GaussianMixtureModel(object):
             y_hat(numpy.ndarray): Array containing the predicted label for each
             x, dimension (N,)
         """
-
         z_ik = self.get_posterior(x)
         y_hat = []
 
