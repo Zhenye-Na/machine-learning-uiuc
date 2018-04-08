@@ -19,6 +19,7 @@ def read_dataset(input_file_path):
         images.
     """
     # Imeplemntation here.
-    features = None
-    labels = None
+    data = genfromtxt(input_file_path, delimiter=',')
+    features = data[:, 1:]
+    labels = data[:, 0]
     return labels, features
