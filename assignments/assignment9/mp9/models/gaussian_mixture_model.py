@@ -36,7 +36,7 @@ class GaussianMixtureModel(object):
 
         # Initialized with identity.
         # np.array of size (n_components, n_dims, n_dims)
-        i = np.eye(self._n_dims) * 10000
+        i = np.eye(self._n_dims) * 100
         self._sigma = np.repeat(i[np.newaxis, :, :],
                                 self._n_components, axis=0)
 
@@ -50,11 +50,7 @@ class GaussianMixtureModel(object):
         """
         for iters in range(self._max_iter):
             z_ik = self._e_step(x)
-            # print(self._sigma)
-            print("e_step", iters)
             self._m_step(x, z_ik)
-            print("m_step", iters)
-            # print(self._sigma)
 
     def _e_step(self, x):
         """E step.
@@ -85,10 +81,10 @@ class GaussianMixtureModel(object):
         self._pi = np.array(norm).reshape(-1, 1)
 
         # Update for mu (n_components, ndims)
-        mu_down = np.sum(z_ik, axis=0)
-        mu_up = np.zeros((1, self._n_dims))
         new_mu = np.zeros_like(self._mu)
+        mu_down = np.sum(z_ik, axis=0)
         for k in range(self._n_components):
+            mu_up = np.zeros((1, self._n_dims))
             for i in range(x.shape[0]):
                 mu_up += z_ik[i, k] * x[i, :]
             new_mu[k, :] = mu_up / mu_down[k]
@@ -98,7 +94,7 @@ class GaussianMixtureModel(object):
         # Update for sigma (n_components, n_dims, n_dims)
         new_sigma = np.zeros_like(self._sigma)
         sigma_down = np.sum(z_ik, axis=0)
-        print(sigma_down)
+
         for k in range(self._n_components):
             mu_k = self._mu[k, :]
             sigma_k = np.zeros((self._n_dims, self._n_dims))
