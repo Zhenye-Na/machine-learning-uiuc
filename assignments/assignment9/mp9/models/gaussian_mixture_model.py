@@ -106,7 +106,7 @@ class GaussianMixtureModel(object):
         Returns:
             (1) The marginal probability for each example, dimension (N,).
         """
-        return None
+        return np.sum(self.get_conditional(x), axis=1).flatten()
 
     def get_posterior(self, x):
         """Compute the posterior probability.
