@@ -43,7 +43,7 @@ def main(_):
     # eval_label, eval_data = io_tools.read_dataset('data/simple_test.csv')
     # y_hat_eval = model.supervised_predict(eval_data)
     # print(eval_label)
-    # print(y_hat_eval)
+    # print(np.unique(y_hat_eval))
     # acc = np.sum(y_hat_eval == eval_label) / (1. * eval_data.shape[0])
     # print("Accuracy: %s" % acc)
 
@@ -64,10 +64,19 @@ def main(_):
     train_label, train_data = io_tools.read_dataset('data/mnist_train.csv')
     model.supervised_fit(train_data, train_label)
 
+    print(train_label.tolist().count(1))
+    print(train_label.tolist().count(2))
+    print(train_label.tolist().count(3))
+    print(train_label.tolist().count(4))
+
     # Eval model.
     eval_label, eval_data = io_tools.read_dataset('data/mnist_test.csv')
     y_hat_eval = model.supervised_predict(eval_data)
     print(eval_label)
+    print(eval_label.tolist().count(1))
+    print(eval_label.tolist().count(2))
+    print(eval_label.tolist().count(3))
+    print(eval_label.tolist().count(4))
     print(np.unique(y_hat_eval))
     acc = np.sum(y_hat_eval == eval_label) / (1. * eval_data.shape[0])
     print("Accuracy: %s" % acc)
