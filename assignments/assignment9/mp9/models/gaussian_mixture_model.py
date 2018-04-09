@@ -50,7 +50,9 @@ class GaussianMixtureModel(object):
         """
         for iters in range(self._max_iter):
             z_ik = self._e_step(x)
+            print("e_step: ", iters)
             self._m_step(x, z_ik)
+            print("m_step: ", iters)
 
     def _e_step(self, x):
         """E step.
@@ -115,6 +117,9 @@ class GaussianMixtureModel(object):
             response(numpy.ndarray): The conditional probability for each example,
                 dimension (N, n_components).
         """
+        # self._mu = np.random.rand(self._n_components, self._n_dims)
+        # self._mu = x[np.random.choice(x.shape[0], self._n_components, False), :]
+
         response = np.zeros((x.shape[0], self._n_components))
 
         # compute conditional probability for each data example
@@ -122,7 +127,6 @@ class GaussianMixtureModel(object):
             for i in range(x.shape[0]):
                 response[i, k] = self._multivariate_gaussian(
                     x[i, :], self._mu[k, :], self._sigma[k])
-
         return response
 
     def get_marginals(self, x):
@@ -167,7 +171,6 @@ class GaussianMixtureModel(object):
             for k in range(self._n_components):
                 up = conditions[i, k] * self._pi[k]
                 z_ik[i, k] = up / down
-
         return z_ik
 
     def _multivariate_gaussian(self, x, mu_k, sigma_k):
@@ -177,15 +180,15 @@ class GaussianMixtureModel(object):
             x(numpy.ndarray): Array containing the features of dimension (N,
                 ndims)
             mu_k(numpy.ndarray): Array containing one single mean (ndims,)
-            sigma_k(numpy.ndarray): Array containing one signle covariance matrix
-                (ndims, ndims)
+            sigma_k(numpy.ndarray): Array containing one signle covariance
+                matrix (ndims, ndims)
         """
         return multivariate_normal.pdf(x, mu_k, sigma_k)
 
     def supervised_fit(self, x, y):
         """Assign each cluster with a label through counting.
 
-        For each cluster, find the most common digit using the provided (x,y)
+        For each cluster, find the most common digit using the provided (x, y)
         and store it in self.cluster_label_map.
         self.cluster_label_map should be a list of length n_components,
         where each element maps to the most common digit in that cluster.
@@ -196,8 +199,25 @@ class GaussianMixtureModel(object):
                 ndims).
             y(numpy.ndarray): Array containing the label of dimension (N,)
         """
-        self.cluster_label_map = []
-        pass
+        self.cluster_label_map = np.random.rand(self._n_components).tolist()
+
+        # Perform EM in dataset
+        self.fit(x)
+
+        # Get z_{ik} after performing EM algorithm
+        z_ik = self.get_posterior(x)
+
+        # Get the highest probability of k^th GMM for each data points
+        # Assign labels for data points
+        em_label = np.argmax(z_ik, axis=1)
+
+        # Check with grountruth labels
+        for k in range(self._n_components):
+            data_idx = np.where(em_label == k)
+            if data_idx[0].size:
+                coor_data = y[data_idx]
+                vote_label = scipy.stats.mode(coor_data)[0]
+                self.cluster_label_map[k] = vote_label
 
     def supervised_predict(self, x):
         """Predict a label for each example in x.
@@ -212,6 +232,6 @@ class GaussianMixtureModel(object):
             x, dimension (N,)
         """
         z_ik = self.get_posterior(x)
-        y_hat = []
-
+        em_label = np.argmax(z_ik, axis=1)
+        y_hat = [self.cluster_label_map[idx][0] for idx in em_label]
         return np.array(y_hat)
