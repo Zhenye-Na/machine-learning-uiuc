@@ -12,8 +12,9 @@ from models.gaussian_mixture_model import GaussianMixtureModel
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('max_iter', 100, 'Number of EM steps to run.')
+flags.DEFINE_integer('max_iter', 50, 'Number of EM steps to run.')
 flags.DEFINE_integer('n_components', 10, 'Number of components')
+
 
 def main(_):
     """High level pipeline.
@@ -21,27 +22,54 @@ def main(_):
     This scripts performs the training and evaling and testing stages for
     semi-supervised learning using kMeans algorithm.
     """
-    # Load dataset.
-    _, unlabeled_data = io_tools.read_dataset('data/simple_test.csv')
-    n_dims = unlabeled_data.shape[1]
+    #########################################################################
 
+    # # Load dataset.
+    # _, unlabeled_data = io_tools.read_dataset('data/simple_test.csv')
+    # n_dims = unlabeled_data.shape[1]
+
+    # # Initialize model.
+    # model = GaussianMixtureModel(n_dims, n_components=FLAGS.n_components,
+    #                              max_iter=FLAGS.max_iter)
+
+    # # Unsupervised training.
+    # model.fit(unlabeled_data)
+
+    # # Supervised training.
+    # train_label, train_data = io_tools.read_dataset('data/simple_test.csv')
+    # model.supervised_fit(train_data, train_label)
+
+    # # Eval model.
+    # eval_label, eval_data = io_tools.read_dataset('data/simple_test.csv')
+    # y_hat_eval = model.supervised_predict(eval_data)
+    # print(eval_label)
+    # print(y_hat_eval)
+    # acc = np.sum(y_hat_eval == eval_label) / (1. * eval_data.shape[0])
+    # print("Accuracy: %s" % acc)
+
+    #########################################################################
+
+    # Load dataset.
+    train_label, train_data = io_tools.read_dataset('data/mnist_train.csv')
+    n_dims = train_data.shape[1]
 
     # Initialize model.
     model = GaussianMixtureModel(n_dims, n_components=FLAGS.n_components,
-                                     max_iter=FLAGS.max_iter)
+                                 max_iter=FLAGS.max_iter)
 
     # Unsupervised training.
-    model.fit(unlabeled_data)
+    model.fit(train_data)
 
     # Supervised training.
-    train_label, train_data = io_tools.read_dataset('data/simple_test.csv')
+    train_label, train_data = io_tools.read_dataset('data/mnist_train.csv')
     model.supervised_fit(train_data, train_label)
 
     # Eval model.
-    eval_label, eval_data = io_tools.read_dataset('data/simple_test.csv')
+    eval_label, eval_data = io_tools.read_dataset('data/mnist_test.csv')
     y_hat_eval = model.supervised_predict(eval_data)
-
-    acc = np.sum(y_hat_eval == eval_label) / (1.*eval_data.shape[0])
+    print(eval_label)
+    print(np.unique(y_hat_eval))
+    acc = np.sum(y_hat_eval == eval_label) / (1. * eval_data.shape[0])
     print("Accuracy: %s" % acc)
 
 if __name__ == '__main__':
