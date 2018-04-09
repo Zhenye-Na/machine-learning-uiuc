@@ -31,12 +31,14 @@ class GaussianMixtureModel(object):
 
         # Initialized with uniform distribution.
         # np.array of size (n_components, 1)
-        self._pi = np.random.uniform(size=(self._n_components, 1))
+        tmp = np.random.dirichlet(np.ones(self._n_components), size=1)
+        self._pi = tmp.reshape(tmp.shape[1], 1)
 
         # Initialized with identity.
         # np.array of size (n_components, n_dims, n_dims)
         i = np.eye(self._n_dims)
-        self._sigma = np.repeat(i[np.newaxis, :, :], self._n_components, axis=0)
+        self._sigma = np.repeat(i[np.newaxis, :, :],
+                                self._n_components, axis=0)
 
     def fit(self, x):
         """Run EM steps.
@@ -81,13 +83,18 @@ class GaussianMixtureModel(object):
         Args:
             x(numpy.ndarray): Feature array of dimension (N, ndims).
         Returns:
-            ret(numpy.ndarray): The conditional probability for each example,
-                dimension (N,, n_components).
+            response(numpy.ndarray): The conditional probability for each example,
+                dimension (N, n_components).
         """
-        ret = None
-        ret = []
+        response = np.zeros((x.shape[0], self._n_components))
 
-        return np.array(ret)
+        # compute conditional probability for each data example
+        for k in range(self._n_components):
+            for i in range(x.shape[0]):
+                response[i, k] = self._multivariate_gaussian(
+                    x[i, :], self._mu[k, :], self._sigma[k])
+
+        return response
 
     def get_marginals(self, x):
         """Compute the marginal probability.
@@ -121,9 +128,9 @@ class GaussianMixtureModel(object):
         Args:
             x(numpy.ndarray): Array containing the features of dimension (N,
                 ndims)
-            mu_k(numpy.ndarray): Array containing one single mean (ndims,1)
+            mu_k(numpy.ndarray): Array containing one single mean (ndims,)
             sigma_k(numpy.ndarray): Array containing one signle covariance matrix
-                (ndims, 1)
+                (ndims, ndims)
         """
         return multivariate_normal.pdf(x, mu_k, sigma_k)
 
