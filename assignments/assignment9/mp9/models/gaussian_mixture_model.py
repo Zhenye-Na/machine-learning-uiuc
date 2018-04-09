@@ -2,6 +2,7 @@
 import numpy as np
 import scipy
 from scipy.stats import multivariate_normal
+from scipy.cluster.vq import kmeans2
 
 
 class GaussianMixtureModel(object):
@@ -25,6 +26,7 @@ class GaussianMixtureModel(object):
         self._max_iter = max_iter
         self._reg_covar = reg_covar
 
+        np.random.seed(42)
         # Randomly Initialize model parameters
         # np.array of size (n_components, n_dims)
         self._mu = np.random.rand(self._n_components, self._n_dims)
@@ -48,6 +50,8 @@ class GaussianMixtureModel(object):
         Args:
             x(numpy.ndarray): Feature array of dimension (N, ndims).
         """
+        # self._mu, _ = kmeans2(x, self._n_components)
+
         for iters in range(self._max_iter):
             z_ik = self._e_step(x)
             print("e_step: ", iters)
@@ -78,9 +82,12 @@ class GaussianMixtureModel(object):
         """
         # Update the parameters.
         # Update for pi (n_components, 1)
-        avg = np.mean(z_ik, axis=0).tolist()
-        norm = [i / sum(avg) for i in avg]
-        self._pi = np.array(norm).reshape(-1, 1)
+
+        # avg = np.mean(z_ik, axis=0).tolist()
+        # norm = [i / sum(avg) for i in avg]
+        # self._pi = np.array(norm).reshape(-1, 1)
+
+        self._pi = np.mean(z_ik, axis=0)
 
         # Update for mu (n_components, ndims)
         new_mu = np.zeros_like(self._mu)
@@ -91,6 +98,8 @@ class GaussianMixtureModel(object):
                 mu_up += z_ik[i, k] * x[i, :]
             new_mu[k, :] = mu_up / mu_down[k]
 
+
+        mu_up = z_ik.T.dot(x)
         self._mu = new_mu
 
         # Update for sigma (n_components, n_dims, n_dims)
@@ -120,13 +129,17 @@ class GaussianMixtureModel(object):
         # self._mu = np.random.rand(self._n_components, self._n_dims)
         # self._mu = x[np.random.choice(x.shape[0], self._n_components, False), :]
 
-        response = np.zeros((x.shape[0], self._n_components))
-
+        # response = np.zeros((x.shape[0], self._n_components))
+        response = []
         # compute conditional probability for each data example
         for k in range(self._n_components):
-            for i in range(x.shape[0]):
-                response[i, k] = self._multivariate_gaussian(
-                    x[i, :], self._mu[k, :], self._sigma[k])
+            # for i in range(x.shape[0]):
+                # response[i, k] = self._multivariate_gaussian(
+                #     x[i, :], self._mu[k, :], self._sigma[k])
+            response.append(self._multivariate_gaussian(
+                x, self._mu[k], self._sigma[k]))
+
+        response = np.transpose(np.array(response))
         return response
 
     def get_marginals(self, x):
@@ -158,7 +171,7 @@ class GaussianMixtureModel(object):
                 of each example, dimension (N, n_components).
         """
         # Initialize z_{ik}
-        z_ik = np.zeros((x.shape[0], self._n_components))
+        # z_ik = np.zeros((x.shape[0], self._n_components))
 
         # get conditional probability
         conditions = self.get_conditional(x)
@@ -166,11 +179,14 @@ class GaussianMixtureModel(object):
         # get marginal probability
         marginals = self.get_marginals(x)
 
-        for i in range(conditions.shape[0]):
-            down = marginals[i]
-            for k in range(self._n_components):
-                up = conditions[i, k] * self._pi[k]
-                z_ik[i, k] = up / down
+        # for i in range(conditions.shape[0]):
+        #     down = marginals[i] + np.finfo(float).eps
+        #     for k in range(self._n_components):
+        #         up = conditions[i, k] * self._pi[k]
+        #         z_ik[i, k] = up / down
+
+        weighted_conditions = np.multiply(conditions, np.transpose(self._pi))
+        z_ik = np.transpose(np.transpose(weighted_conditions) / marginals)
         return z_ik
 
     def _multivariate_gaussian(self, x, mu_k, sigma_k):
@@ -202,7 +218,7 @@ class GaussianMixtureModel(object):
         self.cluster_label_map = np.random.rand(self._n_components).tolist()
 
         # Perform EM in dataset
-        self.fit(x)
+        # self.fit(x)
 
         # Get z_{ik} after performing EM algorithm
         z_ik = self.get_posterior(x)
