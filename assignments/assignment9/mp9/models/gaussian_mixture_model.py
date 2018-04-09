@@ -36,7 +36,7 @@ class GaussianMixtureModel(object):
 
         # Initialized with identity.
         # np.array of size (n_components, n_dims, n_dims)
-        i = np.eye(self._n_dims)
+        i = np.eye(self._n_dims) * 10000
         self._sigma = np.repeat(i[np.newaxis, :, :],
                                 self._n_components, axis=0)
 
@@ -48,7 +48,13 @@ class GaussianMixtureModel(object):
         Args:
             x(numpy.ndarray): Feature array of dimension (N, ndims).
         """
-        pass
+        for iters in range(self._max_iter):
+            z_ik = self._e_step(x)
+            # print(self._sigma)
+            print("e_step", iters)
+            self._m_step(x, z_ik)
+            print("m_step", iters)
+            # print(self._sigma)
 
     def _e_step(self, x):
         """E step.
@@ -61,7 +67,7 @@ class GaussianMixtureModel(object):
             z_ik(numpy.ndarray): Array containing the posterior probability
                 of each example, dimension (N, n_components).
         """
-        return None
+        return self.get_posterior(x)
 
     def _m_step(self, x, z_ik):
         """M step, update the parameters.
@@ -73,7 +79,34 @@ class GaussianMixtureModel(object):
                 (Alternate way of representing categorical distribution of z_i)
         """
         # Update the parameters.
-        pass
+        # Update for pi (n_components, 1)
+        avg = np.mean(z_ik, axis=0).tolist()
+        norm = [i / sum(avg) for i in avg]
+        self._pi = np.array(norm).reshape(-1, 1)
+
+        # Update for mu (n_components, ndims)
+        mu_down = np.sum(z_ik, axis=0)
+        mu_up = np.zeros((1, self._n_dims))
+        new_mu = np.zeros_like(self._mu)
+        for k in range(self._n_components):
+            for i in range(x.shape[0]):
+                mu_up += z_ik[i, k] * x[i, :]
+            new_mu[k, :] = mu_up / mu_down[k]
+
+        self._mu = new_mu
+
+        # Update for sigma (n_components, n_dims, n_dims)
+        new_sigma = np.zeros_like(self._sigma)
+        sigma_down = np.sum(z_ik, axis=0)
+        print(sigma_down)
+        for k in range(self._n_components):
+            mu_k = self._mu[k, :]
+            sigma_k = np.zeros((self._n_dims, self._n_dims))
+            for i in range(x.shape[0]):
+                sigma_k += z_ik[i, k] * np.diag(self._reg_covar +
+                                                np.diag(np.outer(x[i, :] - mu_k, x[i, :] - mu_k)))
+            new_sigma[k] = sigma_k / sigma_down[k]
+        self._sigma = new_sigma
 
     def get_conditional(self, x):
         """Compute the conditional probability.
@@ -102,11 +135,16 @@ class GaussianMixtureModel(object):
         p(x^(i)|pi, mu, sigma)
 
         Args:
-             x(numpy.ndarray): Feature array of dimension (N, ndims).
+            x(numpy.ndarray): Feature array of dimension (N, ndims).
         Returns:
-            (1) The marginal probability for each example, dimension (N,).
+            The marginal probability for each example, dimension (N,).
         """
-        return np.sum(self.get_conditional(x), axis=1).flatten()
+        # get conditional probability
+        conditions = self.get_conditional(x)
+
+        # multiply conditional probability with pi_{k}
+        culmulate = conditions.dot(self._pi)
+        return culmulate.flatten()
 
     def get_posterior(self, x):
         """Compute the posterior probability.
@@ -119,7 +157,21 @@ class GaussianMixtureModel(object):
             z_ik(numpy.ndarray): Array containing the posterior probability
                 of each example, dimension (N, n_components).
         """
-        z_ik = None
+        # Initialize z_{ik}
+        z_ik = np.zeros((x.shape[0], self._n_components))
+
+        # get conditional probability
+        conditions = self.get_conditional(x)
+
+        # get marginal probability
+        marginals = self.get_marginals(x)
+
+        for i in range(conditions.shape[0]):
+            down = marginals[i]
+            for k in range(self._n_components):
+                up = conditions[i, k] * self._pi[k]
+                z_ik[i, k] = up / down
+
         return z_ik
 
     def _multivariate_gaussian(self, x, mu_k, sigma_k):
