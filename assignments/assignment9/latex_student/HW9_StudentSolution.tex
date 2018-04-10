@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{align*}
 p(z_i = k | x_i; \theta^{(t)}) &= \frac{p(x_i | z_i = k)p(z_i = k)}{\sum\limits_{k=1}^{K} p(x_i | z_i)p(z_i)}\\
-&= \frac{\pi_k^{(t)} \mathcal{N}(x_i | \mu_k^{(t)}, \sigma_k^{(t)})}{\pi_k^{(t)} \mathcal{N}(x_i | \mu_k^{(t)}, \sigma_k^{(t)})}
+&= \frac{\pi_k^{(t)} \mathcal{N}(x_i | \mu_k^{(t)}, \sigma_k^{(t)})}{\sum\limits_{k=1}^{K} \pi_k^{(t)} \mathcal{N}(x_i | \mu_k^{(t)}, \sigma_k^{(t)})}
 \end{align*}
 \vspace{0cm}
 }
@@ -67,13 +67,4 @@ k-means is obtained from E-M on GMMs via:
 	\item $c \downarrow 0$
 \end{itemize}
 \vspace{0cm}
-}
-
-\newcommand{\GMMkMeansStudSolF}{
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\vspace{12cm}
 }

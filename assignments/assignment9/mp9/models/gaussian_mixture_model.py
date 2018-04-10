@@ -26,7 +26,7 @@ class GaussianMixtureModel(object):
         self._max_iter = max_iter
         self._reg_covar = reg_covar
 
-        np.random.seed(42)
+        # np.random.seed(42)
         # Randomly Initialize model parameters
         # np.array of size (n_components, n_dims)
         self._mu = np.random.rand(self._n_components, self._n_dims)
@@ -51,6 +51,7 @@ class GaussianMixtureModel(object):
             x(numpy.ndarray): Feature array of dimension (N, ndims).
         """
         # self._mu, _ = kmeans2(x, self._n_components)
+        self._mu = x[np.random.choice(x.shape[0], size=self._n_components, replace=False),:]
 
         for iters in range(self._max_iter):
             z_ik = self._e_step(x)
@@ -87,32 +88,38 @@ class GaussianMixtureModel(object):
         # norm = [i / sum(avg) for i in avg]
         # self._pi = np.array(norm).reshape(-1, 1)
 
-        self._pi = np.mean(z_ik, axis=0)
+        sum_ = np.sum(z_ik, axis=0)
+        self._pi = sum_ / x.shape[0]
 
         # Update for mu (n_components, ndims)
-        new_mu = np.zeros_like(self._mu)
-        mu_down = np.sum(z_ik, axis=0)
-        for k in range(self._n_components):
-            mu_up = np.zeros((1, self._n_dims))
-            for i in range(x.shape[0]):
-                mu_up += z_ik[i, k] * x[i, :]
-            new_mu[k, :] = mu_up / mu_down[k]
-
+        # new_mu = np.zeros_like(self._mu)
+        # mu_down = np.sum(z_ik, axis=0)
+        # for k in range(self._n_components):
+        #     mu_up = np.zeros((1, self._n_dims))
+        #     for i in range(x.shape[0]):
+        #         mu_up += z_ik[i, k] * x[i, :]
+        #     new_mu[k, :] = mu_up / mu_down[k]
 
         mu_up = z_ik.T.dot(x)
-        self._mu = new_mu
+        mu_down = np.sum(z_ik, axis=0).reshape(-1, 1)
+        self._mu = mu_up / mu_down
 
         # Update for sigma (n_components, n_dims, n_dims)
         new_sigma = np.zeros_like(self._sigma)
         sigma_down = np.sum(z_ik, axis=0)
+        reg = np.zeros((x.shape[1], x.shape[1]))
+        np.fill_diagonal(reg, self._reg_covar)
 
         for k in range(self._n_components):
-            mu_k = self._mu[k, :]
-            sigma_k = np.zeros((self._n_dims, self._n_dims))
-            for i in range(x.shape[0]):
-                sigma_k += z_ik[i, k] * np.diag(self._reg_covar +
-                                                np.diag(np.outer(x[i, :] - mu_k, x[i, :] - mu_k)))
-            new_sigma[k] = sigma_k / sigma_down[k]
+            # mu_k = self._mu[k, :]
+            # sigma_k = np.zeros((self._n_dims, self._n_dims))
+            # for i in range(x.shape[0]):
+            #     sigma_k += z_ik[i, k] * np.diag(self._reg_covar +
+            #                                     np.diag(np.outer(x[i, :] - mu_k, x[i, :] - mu_k)))
+            # new_sigma[k] = sigma_k / sigma_down[k]
+            x_demean = x - self._mu[k, :]
+            sigma_up = z_ik[:, k][:, np.newaxis] * x_demean
+            new_sigma[k, :, :] = x_demean.T.dot(sigma_up) / sigma_down[k] + reg
         self._sigma = new_sigma
 
     def get_conditional(self, x):
@@ -186,7 +193,8 @@ class GaussianMixtureModel(object):
         #         z_ik[i, k] = up / down
 
         weighted_conditions = np.multiply(conditions, np.transpose(self._pi))
-        z_ik = np.transpose(np.transpose(weighted_conditions) / marginals)
+        z_ik = np.transpose(np.transpose(
+            weighted_conditions) / (marginals + np.finfo(float).eps))
         return z_ik
 
     def _multivariate_gaussian(self, x, mu_k, sigma_k):
@@ -232,7 +240,7 @@ class GaussianMixtureModel(object):
             data_idx = np.where(em_label == k)
             if data_idx[0].size:
                 coor_data = y[data_idx]
-                vote_label = scipy.stats.mode(coor_data)[0]
+                vote_label = scipy.stats.mode(coor_data)[0][0]
                 self.cluster_label_map[k] = vote_label
 
     def supervised_predict(self, x):
@@ -249,5 +257,5 @@ class GaussianMixtureModel(object):
         """
         z_ik = self.get_posterior(x)
         em_label = np.argmax(z_ik, axis=1)
-        y_hat = [self.cluster_label_map[idx][0] for idx in em_label]
+        y_hat = [self.cluster_label_map[idx] for idx in em_label]
         return np.array(y_hat)

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  8 APR 2018 00:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  8 APR 2018 03:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -305,13 +305,13 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
 ) [2]
 (./hw9_student.aux) ) 
 Here is how much of TeX's memory you used:
- 3848 strings out of 492995
- 53490 string characters out of 6132704
- 121758 words of memory out of 5000000
- 7328 multiletter control sequences out of 15000+600000
+ 3847 strings out of 492995
+ 53473 string characters out of 6132704
+ 120758 words of memory out of 5000000
+ 7327 multiletter control sequences out of 15000+600000
  9817 words of font info for 39 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 39i,15n,34p,554b,407s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 39i,15n,34p,554b,406s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/ams
 fonts/cm/cmbx10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsf
 onts/cm/cmex10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfo
@@ -326,7 +326,7 @@ fb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pf
 b></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.
 pfb>
-Output written on hw9_student.pdf (2 pages, 129782 bytes).
+Output written on hw9_student.pdf (2 pages, 129870 bytes).
 PDF statistics:
  63 PDF objects out of 1000 (max. 8388607)
  45 compressed objects within 1 object stream

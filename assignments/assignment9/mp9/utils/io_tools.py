@@ -1,5 +1,4 @@
-"""Input and output helpers to load in data.
-"""
+"""Input and output helpers to load in data."""
 
 import pickle
 import numpy as np
@@ -8,6 +7,7 @@ from numpy import genfromtxt
 
 def read_dataset(input_file_path):
     """Read input file in csv format from file.
+
     In this csv, each row is an example, stored in the following format.
     label, pixel1, pixel2, pixel3...
 
