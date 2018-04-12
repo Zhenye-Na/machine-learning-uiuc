@@ -9,7 +9,7 @@ class GaussianMixtureModel(object):
     """Gaussian Mixture Model."""
 
     def __init__(self, n_dims, n_components=1,
-                 max_iter=10,
+                 max_iter=25,
                  reg_covar=1e-6):
         """
         Gaussian Mixture Model init funtion.
@@ -26,7 +26,6 @@ class GaussianMixtureModel(object):
         self._max_iter = max_iter
         self._reg_covar = reg_covar
 
-        # np.random.seed(42)
         # Randomly Initialize model parameters
         # np.array of size (n_components, n_dims)
         self._mu = np.random.rand(self._n_components, self._n_dims)
@@ -51,13 +50,13 @@ class GaussianMixtureModel(object):
             x(numpy.ndarray): Feature array of dimension (N, ndims).
         """
         # self._mu, _ = kmeans2(x, self._n_components)
-        self._mu = x[np.random.choice(x.shape[0], size=self._n_components, replace=False),:]
+        self._mu = x[np.random.choice(x.shape[0], size=self._n_components, replace=False), :]
 
         for iters in range(self._max_iter):
             z_ik = self._e_step(x)
-            print("e_step: ", iters)
+            # print("e_step: ", iters)
             self._m_step(x, z_ik)
-            print("m_step: ", iters)
+            # print("m_step: ", iters)
 
     def _e_step(self, x):
         """E step.
@@ -138,6 +137,7 @@ class GaussianMixtureModel(object):
 
         # response = np.zeros((x.shape[0], self._n_components))
         response = []
+
         # compute conditional probability for each data example
         for k in range(self._n_components):
             # for i in range(x.shape[0]):
@@ -226,7 +226,7 @@ class GaussianMixtureModel(object):
         self.cluster_label_map = np.random.rand(self._n_components).tolist()
 
         # Perform EM in dataset
-        # self.fit(x)
+        self.fit(x)
 
         # Get z_{ik} after performing EM algorithm
         z_ik = self.get_posterior(x)
@@ -255,6 +255,7 @@ class GaussianMixtureModel(object):
             y_hat(numpy.ndarray): Array containing the predicted label for each
             x, dimension (N,)
         """
+        # self.fit(x)
         z_ik = self.get_posterior(x)
         em_label = np.argmax(z_ik, axis=1)
         y_hat = [self.cluster_label_map[idx] for idx in em_label]
