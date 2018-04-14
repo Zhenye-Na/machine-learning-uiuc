@@ -1,0 +1,141 @@
+\input{HW10_StudentSolution} %This file will not be provided to students since it contains the solution
+
+% Problem Explanation:
+% - first argument is the number of points
+% - second argument is the title and the text
+ \examproblem{2}{KL Divergence
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%  BEGINNING OF SUBPROBLEMS LIST
+ \begin{enumerate}
+
+% Subproblem description
+ \examproblempart{[1 point] What is the expression of the KL divergence $D_{KL}(q(x)||p(x))$ given two continuous distributions $p(x)$ and $q(x)$ defined on the domain of $\mathbb{R}^1$? \\}
+ 
+\bookletskip{0.0}   %in inches
+
+% Solution box 
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \answer{ \VAESolAa}
+ \end{minipage}
+ }
+
+
+
+% Subproblem description
+\examproblempart{[1 point] Show that the KL divergence is non-negative. You can use Jensen's inequality here without proving it.\\}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box 
+\framebox[14.7cm][l]{
+	\begin{minipage}[b]{14.7cm}
+		\answer{ \VAESolAb}
+	\end{minipage}
+}
+
+\end{enumerate}
+
+
+ \examproblem{3}{In the class, we derive the following equality:
+ 	$$
+ 	\log p_\theta(x) = \int_z q_\phi(z|x)\log\frac{p_\theta(x,z)}{q_\phi(z|x)}dz + \int_z q_\phi(z|x)\log\frac{q_\phi(z|x)}{p_\theta(z|x)}dz 
+ 	$$ 
+ 	Instead of maximizing the log likelihood $\log p_\theta(x)$ w.r.t.~$\theta$, we find a lower bound for $\log p_\theta(x)$ and maximize the lower bound. \\
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%  BEGINNING OF SUBPROBLEMS LIST
+\begin{enumerate}
+
+
+% Subproblem description 
+ \examproblempart{[1 point] Use the above equation and your result in 1(b) to give a lower bound for $\log p_\theta(x)$. 
+}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box 
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \answer{\VAESolBa}
+ \end{minipage}
+ }
+
+
+% Subproblem description 
+\examproblempart{[1 point] What do people usually call the bound?\\
+}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box 
+\framebox[14.7cm][l]{
+	\begin{minipage}[b]{14.7cm}
+		\answer{\VAESolBb}
+	\end{minipage}
+}
+
+% Subproblem description 
+\examproblempart{[1 point] In what condition will the bound be tight?\\
+}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box 
+\framebox[14.7cm][l]{
+	\begin{minipage}[b]{14.7cm}
+		\answer{\VAESolBc}
+	\end{minipage}
+}
+
+
+ \end{enumerate}
+
+ \examproblem{2}{Given $z\in \mathbb{R}^1$, $p(z) \sim \mathcal{N}(0,1)$ and $q(z|x)\sim\mathcal{N}(\mu_z,\sigma^2_z)$, write $D_{KL}(q(z|x)||p(z))$ in terms of $\sigma_z$ and $\mu_z$. \\
+}
+
+
+\bookletskip{0.0}   %in inches
+
+% Solution box 
+\framebox[14.7cm][l]{
+	\begin{minipage}[b]{14.7cm}
+		\answer{\VAESolC}
+	\end{minipage}
+}
+
+
+
+ \examproblem{1}{In VAEs, the encoder computes the mean $\mu_z$ and the variance $\sigma_z^2$ of $q_\phi(z|x)$ assuming $q_\phi(z|x)$ is Gaussian. Explain why we usually model $\sigma_z^2$ in log space, i.e., modeling $\log\sigma_z^2$ instead of $\sigma_z^2$ when implementing it using neural nets?\\
+}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box 
+\framebox[14.7cm][l]{
+	\begin{minipage}[b]{14.7cm}
+		\answer{\VAESolD}
+	\end{minipage}
+}
+
+
+ 
+  \examproblem{1}{Why do we need the reparameterization trick when training VAEs instead of directly sampling from the latent distribution $\mathcal{N}(\mu_z,\sigma_z^2)$? \\
+ }
+ 
+
+\bookletskip{0.0}   %in inches
+
+% Solution box 
+\framebox[14.7cm][l]{
+	\begin{minipage}[b]{14.7cm}
+		\answer{\VAESolE}
+	\end{minipage}
+}
+
+
+\bookletskip{0.0}   %in inches
+
