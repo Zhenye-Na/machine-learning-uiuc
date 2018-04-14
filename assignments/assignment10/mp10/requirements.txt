@@ -1,0 +1,9 @@
+numpy
+scipy
+matplotlib
+scikit-image
+Pillow
+scikit-learn
+pep8
+tensorflow
+nose2
