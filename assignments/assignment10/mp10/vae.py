@@ -1,4 +1,4 @@
-"""Variation autoencoder."""
+"""Variation Autoencoder."""
 
 import numpy as np
 import tensorflow as tf
@@ -9,16 +9,16 @@ from tensorflow.contrib.slim import fully_connected
 
 
 class VariationalAutoencoder(object):
-    """Varational Autoencoder.
-    """
-    def __init__(self, ndims=784, nlatent=2):
-        """Initializes a VAE. (**Do not change this function**)
+    """Varational Autoencoder."""
 
+    def __init__(self, ndims=784, nlatent=2):
+        """Initialize a VAE.
+
+        (**Do not change this function**)
         Args:
             ndims(int): Number of dimensions in the feature.
             nlatent(int): Number of dimensions in the latent space.
         """
-
         self._ndims = ndims
         self._nlatent = nlatent
 
@@ -43,7 +43,7 @@ class VariationalAutoencoder(object):
         self.session.run(tf.global_variables_initializer())
 
     def _sample_z(self, z_mean, z_log_var):
-        """Samples z using reparametrization trick.
+        """Sample z using reparametrization trick.
 
         Args:
             z_mean (tf.Tensor): The latent mean,
@@ -53,10 +53,10 @@ class VariationalAutoencoder(object):
         Returns:
             z (tf.Tensor): Random sampled z of dimension (None, _nlatent)
         """
-
-        z = None
-        ####### Implementation Here ######
-        pass        
+        # z = tf.random_normal(tf.shape(z_mean), mean=z_mean, stddev=tf.sqrt(
+        #     tf.exp(z_log_var)), dtype=tf.float32)
+        epsilon = tf.random_normal(tf.shape(z_mean), 0, 1, dtype=tf.float32)
+        z = z_mean + tf.sqrt(tf.exp(z_log_var)) * epsilon
         return z
 
     def _encoder(self, x):
@@ -82,12 +82,21 @@ class VariationalAutoencoder(object):
         """
         z_mean = None
         z_log_var = None
-        ####### Implementation Here ######
-        pass
+
+        # Implementation Here
+        num_outputs = self._nlatent * 2
+        input_ = fully_connected(
+            inputs=x, num_outputs=100, activation_fn=tf.nn.relu)
+        hidden = fully_connected(
+            inputs=input_, num_outputs=50, activation_fn=tf.nn.softplus)
+        output = fully_connected(
+            inputs=hidden, num_outputs=num_outputs, activation_fn=tf.nn.relu)
+        z_mean = output[:, 0:self._nlatent]
+        z_log_var = output[:, self._nlatent:]
         return z_mean, z_log_var
 
     def _decoder(self, z):
-        """From a sampled z, decode back into image.
+        """Decode back into image, from a sampled z.
 
         Builds a three layer network of fully connected layers,
         with 50, 100, _ndims nodes.
@@ -101,14 +110,19 @@ class VariationalAutoencoder(object):
         Returns:
             f(tf.Tensor): Decoded features, tensor of dimension (None, _ndims).
         """
-
         f = None
-        ####### Implementation Here ######
-        pass
+        # Implementation Here ######
+        dense = fully_connected(inputs=z, num_outputs=50,
+                                activation_fn=tf.nn.relu)
+        hidden = fully_connected(
+            inputs=dense, num_outputs=100, activation_fn=tf.nn.softplus)
+        output = fully_connected(
+            inputs=hidden, num_outputs=self._ndims, activation_fn=tf.nn.relu)
+        f = output
         return f
 
     def _latent_loss(self, z_mean, z_log_var):
-        """Constructs the latent loss.
+        """Construct the latent loss.
 
         Args:
             z_mean(tf.Tensor): Tensor of dimension (None, _nlatent)
@@ -118,13 +132,14 @@ class VariationalAutoencoder(object):
             latent_loss(tf.Tensor): A scalar Tensor of dimension ()
                 containing the latent loss.
         """
-        latent_loss = None
-        ####### Implementation Here ######
-        pass
-        return latent_loss
+        # latent_loss = None
+        # Implementation Here ######
+        latent_loss = tf.reduce_sum(
+            tf.exp(z_log_var) + tf.square(z_mean) - 1 - z_log_var)
+        return -0.5 * latent_loss
 
     def _reconstruction_loss(self, f, x_gt):
-        """Constructs the reconstruction loss, assuming Gaussian distribution.
+        """Construct the reconstruction loss, assuming Gaussian distribution.
 
         Args:
             f(tf.Tensor): Predicted score for each example, dimension (None,
@@ -136,12 +151,12 @@ class VariationalAutoencoder(object):
                 containing the reconstruction loss.
         """
         recon_loss = None
-        ####### Implementation Here ######
-        pass
+        # Implementation Here ######
+        recon_loss = tf.nn.l2_loss(f - x_gt, name="recon_loss")
         return recon_loss
 
-    def loss(self, f, x_gt, z_mean, z_var):
-        """Computes the total loss.
+    def loss(self, f, x_gt, z_mean, z_log_var):
+        """Compute the total loss.
 
         Computes the sum of latent and reconstruction loss.
 
@@ -160,12 +175,13 @@ class VariationalAutoencoder(object):
                 latent_loss and reconstruction loss.
         """
         total_loss = None
-        ####### Implementation Here ######
-        pass
+        # Implementation Here ######
+        total_loss = self._latent_loss(
+            z_mean, z_log_var) + self._reconstruction_loss(f, x_gt)
         return total_loss
 
     def update_op(self, loss, learning_rate):
-        """Creates the update optimizer.
+        """Create the update optimizer.
 
         Use tf.train.AdamOptimizer to obtain the update op.
 
@@ -176,13 +192,12 @@ class VariationalAutoencoder(object):
         Returns:
             train_op(tf.Operation): Update opt tensorflow operation.
         """
-        train_op = None
-        ####### Implementation Here ######
-        pass        
+        train_op = tf.train.AdamOptimizer(
+            learning_rate=learning_rate, name='Adam').minimize(loss)
         return train_op
 
     def generate_samples(self, z_np):
-        """Generates random samples from the provided z_np.
+        """Generate random samples from the provided z_np.
 
         Args:
             z_np(numpy.ndarray): Numpy array of dimension
@@ -193,7 +208,8 @@ class VariationalAutoencoder(object):
                 dimension (batch_size, _ndims).
         """
         out = None
-        ####### Implementation Here ######
-        pass
+        print(z_np.shape)
+        out = self.session.run(self._decoder(
+            tf.convert_to_tensor(z_np, dtype=tf.float32)))
+        print(type(out))
         return out
-
