@@ -80,17 +80,21 @@ class VariationalAutoencoder(object):
             z_log_var(tf.Tensor): The latent log variance, tensor of dimension
                 (None, _nlatent).
         """
-        z_mean = None
-        z_log_var = None
-
-        # Implementation Here
+        # Number of outputs for encoder
         num_outputs = self._nlatent * 2
+        # Input Layer
         input_ = fully_connected(
-            inputs=x, num_outputs=100, activation_fn=tf.nn.relu)
+            inputs=x, num_outputs=100, activation_fn=tf.nn.softplus)
+
+        # Hidden Layer
         hidden = fully_connected(
             inputs=input_, num_outputs=50, activation_fn=tf.nn.softplus)
+
+        # Output Layer
         output = fully_connected(
-            inputs=hidden, num_outputs=num_outputs, activation_fn=tf.nn.relu)
+            inputs=hidden, num_outputs=num_outputs, activation_fn=None)
+
+        # Extract mean and log-variance from Output
         z_mean = output[:, 0:self._nlatent]
         z_log_var = output[:, self._nlatent:]
         return z_mean, z_log_var
@@ -110,16 +114,21 @@ class VariationalAutoencoder(object):
         Returns:
             f(tf.Tensor): Decoded features, tensor of dimension (None, _ndims).
         """
-        f = None
-        # Implementation Here ######
+        # Number of outputs for decoder
+        num_outputs = self._ndims
+
+        # Dense Layer
         dense = fully_connected(inputs=z, num_outputs=50,
-                                activation_fn=tf.nn.relu)
+                                activation_fn=tf.nn.softplus)
+
+        # Hidden Layer
         hidden = fully_connected(
             inputs=dense, num_outputs=100, activation_fn=tf.nn.softplus)
+
+        # Output Layer
         output = fully_connected(
-            inputs=hidden, num_outputs=self._ndims, activation_fn=tf.nn.relu)
-        f = output
-        return f
+            inputs=hidden, num_outputs=num_outputs, activation_fn=tf.nn.sigmoid)
+        return output
 
     def _latent_loss(self, z_mean, z_log_var):
         """Construct the latent loss.
@@ -132,11 +141,10 @@ class VariationalAutoencoder(object):
             latent_loss(tf.Tensor): A scalar Tensor of dimension ()
                 containing the latent loss.
         """
-        # latent_loss = None
-        # Implementation Here ######
-        latent_loss = tf.reduce_sum(
-            tf.exp(z_log_var) + tf.square(z_mean) - 1 - z_log_var)
-        return -0.5 * latent_loss
+        latent_loss = -0.5 * tf.reduce_mean(tf.reduce_sum(
+            tf.exp(z_log_var) + tf.square(z_mean) - 1 - z_log_var, 1),
+            name="latent_loss")
+        return latent_loss
 
     def _reconstruction_loss(self, f, x_gt):
         """Construct the reconstruction loss, assuming Gaussian distribution.
@@ -150,8 +158,7 @@ class VariationalAutoencoder(object):
             recon_loss(tf.Tensor): A scalar Tensor for dimension ()
                 containing the reconstruction loss.
         """
-        recon_loss = None
-        # Implementation Here ######
+        # recon_loss = tf.losses.mean_squared_error(labels=x_gt, predictions=f)
         recon_loss = tf.nn.l2_loss(f - x_gt, name="recon_loss")
         return recon_loss
 
@@ -174,8 +181,6 @@ class VariationalAutoencoder(object):
             total_loss: Tensor for dimension (). Sum of
                 latent_loss and reconstruction loss.
         """
-        total_loss = None
-        # Implementation Here ######
         total_loss = self._latent_loss(
             z_mean, z_log_var) + self._reconstruction_loss(f, x_gt)
         return total_loss
@@ -208,8 +213,6 @@ class VariationalAutoencoder(object):
                 dimension (batch_size, _ndims).
         """
         out = None
-        print(z_np.shape)
-        out = self.session.run(self._decoder(
-            tf.convert_to_tensor(z_np, dtype=tf.float32)))
-        print(type(out))
+        out = self.outputs_tensor.eval(
+            session=self.session, feed_dict={self.z: z_np})
         return out

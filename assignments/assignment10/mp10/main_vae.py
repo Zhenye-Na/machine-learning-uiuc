@@ -11,7 +11,7 @@ from tensorflow.contrib.learn.python.learn.datasets.mnist import read_data_sets
 
 
 def train(model, mnist_dataset, learning_rate=0.0005, batch_size=16,
-          num_steps=50):
+          num_steps=5000):
     """Implement the training loop of mini-batch gradient descent.
 
     Performs mini-batch gradient descent with the indicated batch_size and
@@ -47,13 +47,13 @@ def main(_):
 
     # Start training
     train(model, mnist_dataset)
-    print("training over!")
+
     # Plot out latent space, for +/- 3 std.
     std = 1
     x_z = np.linspace(-3 * std, 3 * std, 20)
     y_z = np.linspace(-3 * std, 3 * std, 20)
 
-    out = np.empty((28 * 20, 28 * 0))
+    out = np.empty((28 * 20, 28 * 20))
     for x_idx, x in enumerate(x_z):
         for y_idx, y in enumerate(y_z):
             z_mu = np.array([[y, x]])
