@@ -141,7 +141,7 @@ class VariationalAutoencoder(object):
             latent_loss(tf.Tensor): A scalar Tensor of dimension ()
                 containing the latent loss.
         """
-        latent_loss = -0.5 * tf.reduce_mean(tf.reduce_sum(
+        latent_loss = 0.5 * tf.reduce_mean(tf.reduce_sum(
             tf.exp(z_log_var) + tf.square(z_mean) - 1 - z_log_var, 1),
             name="latent_loss")
         return latent_loss

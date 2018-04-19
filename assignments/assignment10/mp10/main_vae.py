@@ -22,7 +22,7 @@ def train(model, mnist_dataset, learning_rate=0.0005, batch_size=16,
         mnist_dataset: Mnist dataset.
         learning_rate(float): Learning rate.
         batch_size(int): Batch size used for training.
-        num_steps(int): Number of steps to run the update ops. 5000
+        num_steps(int): Number of steps to run the update ops.
     """
     for step in range(0, num_steps):
         batch_x, _ = mnist_dataset.train.next_batch(batch_size)
@@ -31,7 +31,6 @@ def train(model, mnist_dataset, learning_rate=0.0005, batch_size=16,
             feed_dict={model.x_placeholder: batch_x,
                        model.learning_rate_placeholder: learning_rate}
         )
-        print("Number of step: ", step)
 
 
 def main(_):
