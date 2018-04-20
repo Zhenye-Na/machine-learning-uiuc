@@ -1,0 +1,96 @@
+% !TEX root = HW11.tex
+
+\input{HW11_StudentSolution} %The students have to fill this file to print the solution
+
+% Problem Explanation:
+% - first argument is the number of points
+% - second argument is the title and the text
+\examproblem{8}{Generative Adversarial Network (GAN)
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%  BEGINNING OF SUBPROBLEMS LIST
+ \begin{enumerate}
+
+ % Subproblem description
+\examproblempart{What is the cost function for classical GANs? Use $D_w(x)$ as the discriminator and  $G_{\theta}(x)$ as the generator.\\}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GANStudSolA}
+
+ \end{minipage}
+ }
+
+ % Subproblem description
+ \examproblempart{Assume arbitrary capacity for both discriminator and generator. In this case we refer to the discriminator using $D(x)$, and denote the distribution on the data domain induced by the generator via $p_G(x)$. State an equivalent problem to the one asked for in part (a), by using $p_G(x)$ and the ground truth data distribution $p_{data}(x)$.\\}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GANStudSolB}
+
+ \end{minipage}
+ }
+
+ \bookletpage
+ % Subproblem description
+ \examproblempart{Assuming arbitrary capacity, derive the optimal discriminator $D^*(x)$ in terms of $p_{data}(x)$ and $p_G(x)$.\\
+ You may need the Euler-Lagrange equation:
+$$
+\frac{\partial L(x, D, \dot{D})}{\partial D} - \frac{d}{dx} \frac{\partial L(x, D, \dot{D})}{\partial \dot{D}} = 0
+$$
+where $\dot{D} = \partial D/\partial x$.
+
+ }
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GANStudSolC}
+
+ \end{minipage}
+ }
+
+% Subproblem description
+\examproblempart{Assume arbitrary capacity  and an optimal discriminator $D^*(x)$, show that the optimal generator, $G^*(x)$, generates the distribution $p_G^* = p_{data}$, where
+$p_{data}(x)$ is the data distribution\\
+You may need the Jensen-Shannon divergence:
+ $$
+ \operatorname{JSD}(p_{\text{data}}, p_G) = \frac{1}{2} D_{KL}(p_{\text{data}}, M) + \frac{1}{2} D_{KL}(p_{G}, M) \quad\text{with}\quad M = \frac{1}{2}(p_{\text{data}} + p_G)
+ $$
+ }
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GANStudSolD}
+
+ \end{minipage}
+ }
+
+% Subproblem description
+\examproblempart{More recently, researchers have proposed to use the Wasserstein distance instead of divergences to train the models since the KL divergence often fails to give meaningful information for training. Consider three distributions, $\bP_1 \sim U[0,1]$, $\bP_2 \sim U[0.5,1.5]$, and $\bP_3 \sim U[1,2]$. Calculate $D_{KL}(\bP_1,\bP_2)$, $D_{KL}(\bP_1,\bP_3)$, $\bW_1(\bP_1, \bP_2)$, and $\bW_1(\bP_1, \bP_3)$, where $\bW_1$ is the Wasserstein-1 distance between distributions.\\}
+
+\bookletskip{0.0}   %in inches
+
+% Solution box
+ \framebox[14.7cm][l]{
+ \begin{minipage}[b]{14.7cm}
+ \inbooklet{Your answer: \GANStudSolE}
+
+ \end{minipage}
+ }
+
+ %%%%%%%%%%%% END OF SUBPROBLEMS LIST
+
+\end{enumerate}
