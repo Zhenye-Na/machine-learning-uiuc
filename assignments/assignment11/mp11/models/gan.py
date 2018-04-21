@@ -40,12 +40,12 @@ class Gan(object):
         # Learning rate
         self.learning_rate_placeholder = tf.placeholder(tf.float32, [])
 
-        # Add optimizers for appropriate variables
-        self.d_optimizer = tf.train.GradientDescentOptimizer(
+        # Add optimizers for appropriate variables  AdamOptimizer  GradientDescentOptimizer
+        self.d_optimizer = tf.train.AdamOptimizer(
             learning_rate=self.learning_rate_placeholder,
             name='d_optimizer').minimize(self.d_loss)
 
-        self.g_optimizer = tf.train.GradientDescentOptimizer(
+        self.g_optimizer = tf.train.AdamOptimizer(
             learning_rate=self.learning_rate_placeholder,
             name='g_optimizer').minimize(self.g_loss)
 
@@ -58,7 +58,7 @@ class Gan(object):
 
         Args:
             x (tf.Tensor): The input tensor of dimension (None, 784).
-            reuse (Boolean): re use variables with same name in scope instead
+            reuse (Boolean): reuse variables with same name in scope instead
                 of creating new ones, check Tensorflow documentation
         Returns:
             y (tf.Tensor): Scalar output prediction D(x) for true vs fake
@@ -67,36 +67,90 @@ class Gan(object):
         DO NOT USE AN ACTIVATION FUNCTION AT THE OUTPUT LAYER HERE.
 
         """
-        with tf.variable_scope("discriminator", reuse=reuse) as scope:
+        with tf.variable_scope("discriminator", reuse=tf.AUTO_REUSE) as scope:
 
-            # if reuse:
-            #     scope.reuse_variables()
+            # # Input Layer
+            # inputs = layers.fully_connected(
+            #     inputs=x, num_outputs=512, activation_fn=tf.nn.relu)
 
-            # Input Layer
-            inputs = layers.fully_connected(
-                inputs=x, num_outputs=512, activation_fn=tf.nn.relu)
+            # # Drop Out
+            # drop_out = tf.layers.dropout(
+            #     inputs=inputs, rate=0.05)
 
-            # Drop Out
-            drop_out1 = tf.layers.dropout(
-                inputs=inputs, rate=0.05)
+            # # Hidden Layer 1
+            # hidden1 = layers.fully_connected(
+            #     inputs=drop_out, num_outputs=256, activation_fn=tf.nn.relu)
 
-            # Hidden Layer 1
-            hidden1 = layers.fully_connected(
-                inputs=drop_out1, num_outputs=256, activation_fn=tf.nn.relu)
+            # # Drop Out
+            # drop_out = tf.layers.dropout(
+            #     inputs=hidden1, rate=0.05)
 
-            # Drop Out
-            drop_out2 = tf.layers.dropout(
-                inputs=hidden1, rate=0.05)
+            # # Hidden Layer 2
+            # hidden2 = layers.fully_connected(
+            #     inputs=drop_out, num_outputs=64, activation_fn=tf.nn.relu)
 
-            # Hidden Layer 2
-            hidden2 = layers.fully_connected(
-                inputs=drop_out2, num_outputs=64, activation_fn=tf.nn.relu)
+            # # Output Layer
+            # y = layers.fully_connected(
+            #     inputs=hidden2, num_outputs=1, activation_fn=None)
 
-            # Output Layer
-            y = layers.fully_connected(
-                inputs=hidden2, num_outputs=1, activation_fn=None)
+            keep_prob = 0.9
+            num_h1 = 256
+            num_h2 = 128
 
-            return y
+            # Fully Connected Layer 1 (784 -> 200) , dropout
+            w1 = tf.get_variable(name="d_w1",
+                                 shape=[self._ndims, num_h1],
+                                 dtype=tf.float32,
+                                 initializer=tf.truncated_normal_initializer())
+            # w1 = tf.Variable(tf.truncated_normal(
+            #     [img_size, h2_size], stddev=0.1), name="d_w1")
+
+            b1 = tf.get_variable(name="d_b1",
+                                 shape=[num_h1],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
+
+            h1 = tf.nn.dropout(tf.nn.relu(tf.matmul(x, w1) + b1), keep_prob)
+
+            # Fully Connected Layer 2 (200  -> 150 ) , dropout
+            # w2 = tf.Variable(tf.truncated_normal(
+            #     [h2_size, h1_size], stddev=0.1),
+            #     name="d_w2", dtype=tf.float32)
+
+            w2 = tf.get_variable(name="d_w2",
+                                 shape=[num_h1, num_h2],
+                                 dtype=tf.float32,
+                                 initializer=tf.truncated_normal_initializer())
+
+            # b2 = tf.Variable(tf.zeros([h1_size]),
+            #                  name="d_b2", dtype=tf.float32)
+
+            b2 = tf.get_variable(name="d_b2",
+                                 shape=[num_h2],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
+
+            h2 = tf.nn.dropout(tf.nn.relu(tf.matmul(h1, w2) + b2), keep_prob)
+
+            # Fully Connected Layer 3 (150 (h1_size) -> 1)
+            # w3 = tf.Variable(tf.truncated_normal(
+            #     [h1_size, 1], stddev=0.1), name="d_w3", dtype=tf.float32)
+
+            w3 = tf.get_variable(name="d_w3",
+                                 shape=[num_h2, 1],
+                                 dtype=tf.float32,
+                                 initializer=tf.truncated_normal_initializer())
+
+            # b3 = tf.Variable(tf.zeros([1]), name="d_b3", dtype=tf.float32)
+
+            b3 = tf.get_variable(name="d_b3",
+                                 shape=[1],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
+
+            y = tf.matmul(h2, w3) + b3
+
+        return y
 
     def _discriminator_loss(self, y, y_hat):
         """Loss for the discriminator.
@@ -134,24 +188,54 @@ class Gan(object):
         """
         with tf.variable_scope("generator", reuse=reuse) as scope:
 
-            # if reuse:
-            #     scope.reuse_variables()
+            # # Input Layer
+            # inputs = layers.fully_connected(
+            #     inputs=z, num_outputs=64, activation_fn=tf.nn.relu)
 
-            # Input Layer
-            inputs = layers.fully_connected(
-                inputs=z, num_outputs=64, activation_fn=tf.nn.relu)
+            # # Hidden Layer 1
+            # hidden1 = layers.fully_connected(
+            #     inputs=inputs, num_outputs=256, activation_fn=tf.nn.relu)
 
-            # Hidden Layer 1
-            hidden1 = layers.fully_connected(
-                inputs=inputs, num_outputs=256, activation_fn=tf.nn.relu)
+            # # Hidden Layer 2
+            # hidden2 = layers.fully_connected(
+            #     inputs=hidden1, num_outputs=512, activation_fn=tf.nn.relu)
 
-            # Hidden Layer 2
-            hidden2 = layers.fully_connected(
-                inputs=hidden1, num_outputs=512, activation_fn=tf.nn.relu)
+            # # Output Layer
+            # x_hat = layers.fully_connected(
+            #     inputs=hidden2, num_outputs=self._ndims, activation_fn=tf.nn.softplus)
 
-            # Output Layer
-            x_hat = layers.fully_connected(
-                inputs=hidden2, num_outputs=self._ndims, activation_fn=tf.nn.softplus)
+            h1_size = 150
+            h2_size = 300
+
+            # Fully Connected Layer 1 (100 (latent-vector) -> 150 (h1_size))
+            w1 = tf.Variable(tf.truncated_normal(
+                [self._nlatent, h1_size], stddev=0.1),
+                name="g_w1",
+                dtype=tf.float32)
+            b1 = tf.Variable(tf.zeros([h1_size]),
+                             name="g_b1", dtype=tf.float32)
+            h1 = tf.nn.relu(tf.matmul(z, w1) + b1)
+
+            # Fully Connected Layer 2 (150 (h1_size) -> 300 (h2_size))
+            w2 = tf.Variable(tf.truncated_normal(
+                [h1_size, h2_size], stddev=0.1),
+                name="g_w2",
+                dtype=tf.float32)
+            b2 = tf.Variable(tf.zeros([h2_size]),
+                             name="g_b2", dtype=tf.float32)
+            h2 = tf.nn.relu(tf.matmul(h1, w2) + b2)
+
+            # Fully Connected Layer 3 (300 -> self._ndims)
+            w3 = tf.Variable(tf.truncated_normal(
+                [h2_size, self._ndims], stddev=0.1),
+                name="g_w3",
+                dtype=tf.float32)
+            b3 = tf.Variable(tf.zeros([self._ndims]),
+                             name="g_b3", dtype=tf.float32)
+            h3 = tf.matmul(h2, w3) + b3
+
+            # generated images
+            x_hat = tf.nn.tanh(h3)
 
             return x_hat
 
@@ -165,7 +249,7 @@ class Gan(object):
             l (tf.Scalar): average batch loss for the discriminator.
 
         """
-        l = -tf.reduce_mean(y_hat, name="g_loss")
+        l = - tf.reduce_mean(tf.log(y_hat), name="g_loss")
         # l = -tf.log(y_hat)
         return l
 
