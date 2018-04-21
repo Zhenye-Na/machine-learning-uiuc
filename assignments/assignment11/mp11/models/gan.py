@@ -14,8 +14,8 @@ class Gan(object):
         """Initialize a GAN.
 
         Args:
-            ndims(int): Number of dimensions in the feature.
-            nlatent(int): Number of dimensions in the latent space.
+            ndims (int): Number of dimensions in the feature.
+            nlatent (int): Number of dimensions in the latent space.
         """
         self._ndims = ndims
         self._nlatent = nlatent
@@ -40,12 +40,13 @@ class Gan(object):
         # Learning rate
         self.learning_rate_placeholder = tf.placeholder(tf.float32, [])
 
-        # Add optimizers for appropriate variables  AdamOptimizer  GradientDescentOptimizer
-        self.d_optimizer = tf.train.AdamOptimizer(
+        # AdamOptimizer  GradientDescentOptimizer
+        # Add optimizers for appropriate variables
+        self.d_optimizer = tf.train.GradientDescentOptimizer(
             learning_rate=self.learning_rate_placeholder,
             name='d_optimizer').minimize(self.d_loss)
 
-        self.g_optimizer = tf.train.AdamOptimizer(
+        self.g_optimizer = tf.train.GradientDescentOptimizer(
             learning_rate=self.learning_rate_placeholder,
             name='g_optimizer').minimize(self.g_loss)
 
@@ -67,7 +68,7 @@ class Gan(object):
         DO NOT USE AN ACTIVATION FUNCTION AT THE OUTPUT LAYER HERE.
 
         """
-        with tf.variable_scope("discriminator", reuse=tf.AUTO_REUSE) as scope:
+        with tf.variable_scope("discriminator", reuse=reuse) as scope:
 
             # # Input Layer
             # inputs = layers.fully_connected(
@@ -93,6 +94,9 @@ class Gan(object):
             # y = layers.fully_connected(
             #     inputs=hidden2, num_outputs=1, activation_fn=None)
 
+            if reuse:
+                scope.reuse_variables()
+
             keep_prob = 0.9
             num_h1 = 256
             num_h2 = 128
@@ -102,8 +106,6 @@ class Gan(object):
                                  shape=[self._ndims, num_h1],
                                  dtype=tf.float32,
                                  initializer=tf.truncated_normal_initializer())
-            # w1 = tf.Variable(tf.truncated_normal(
-            #     [img_size, h2_size], stddev=0.1), name="d_w1")
 
             b1 = tf.get_variable(name="d_b1",
                                  shape=[num_h1],
@@ -113,10 +115,6 @@ class Gan(object):
             h1 = tf.nn.dropout(tf.nn.relu(tf.matmul(x, w1) + b1), keep_prob)
 
             # Fully Connected Layer 2 (200  -> 150 ) , dropout
-            # w2 = tf.Variable(tf.truncated_normal(
-            #     [h2_size, h1_size], stddev=0.1),
-            #     name="d_w2", dtype=tf.float32)
-
             w2 = tf.get_variable(name="d_w2",
                                  shape=[num_h1, num_h2],
                                  dtype=tf.float32,
@@ -150,6 +148,19 @@ class Gan(object):
 
             y = tf.matmul(h2, w3) + b3
 
+            # print("w1", w1)
+            # print("b1", b1)
+            # print("h1", h1)
+            # print("")
+            # print("w2", w2)
+            # print("b2", b2)
+            # print("h2", h2)
+            # print("")
+            # print("w3", w3)
+            # print("b3", b3)
+            # print("h3", y)
+            # print("")
+
         return y
 
     def _discriminator_loss(self, y, y_hat):
@@ -164,15 +175,18 @@ class Gan(object):
             l (tf.Scalar): average batch loss for the discriminator.
 
         """
-        sigmoid_y = tf.sigmoid(y)
-        sigmoid_y_hat = tf.sigmoid(y_hat)
-        # l = tf.reduce_mean(
+        # sigmoid_y = tf.nn.sigmoid(y)
+        # sigmoid_y_hat = tf.nn.sigmoid(y_hat)
+        # l = tf.reduce_mean(- tf.log(sigmoid_y) + tf.log(1 - sigmoid_y_hat))
+
+        # l = - (tf.log(y) + tf.log(1 - y_hat))
+
+        # l = -tf.reduce_mean(
         #     tf.nn.sigmoid_cross_entropy_with_logits(labels=y,
         #                                             logits=y_hat,
         #                                             name="d_loss"))
 
-        l = -tf.reduce_mean(tf.log(sigmoid_y) + tf.log(1 - sigmoid_y_hat))
-        # l = - (tf.log(y) + tf.log(1 - y_hat))
+        l = tf.reduce_mean(y_hat) - tf.reduce_mean(y)
 
         return l
 
@@ -208,34 +222,83 @@ class Gan(object):
             h2_size = 300
 
             # Fully Connected Layer 1 (100 (latent-vector) -> 150 (h1_size))
-            w1 = tf.Variable(tf.truncated_normal(
-                [self._nlatent, h1_size], stddev=0.1),
-                name="g_w1",
-                dtype=tf.float32)
-            b1 = tf.Variable(tf.zeros([h1_size]),
-                             name="g_b1", dtype=tf.float32)
+            # w1 = tf.Variable(tf.truncated_normal(
+            #     [self._nlatent, h1_size], stddev=0.1),
+            #     name="g_w1",
+            #     dtype=tf.float32)
+
+            w1 = tf.get_variable(name="g_w1",
+                                 shape=[self._nlatent, h1_size],
+                                 dtype=tf.float32,
+                                 initializer=tf.truncated_normal_initializer())
+
+            # b1 = tf.Variable(tf.zeros([h1_size]),
+            #                  name="g_b1", dtype=tf.float32)
+
+            b1 = tf.get_variable(name="g_b1",
+                                 shape=[h1_size],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
+
             h1 = tf.nn.relu(tf.matmul(z, w1) + b1)
 
             # Fully Connected Layer 2 (150 (h1_size) -> 300 (h2_size))
-            w2 = tf.Variable(tf.truncated_normal(
-                [h1_size, h2_size], stddev=0.1),
-                name="g_w2",
-                dtype=tf.float32)
-            b2 = tf.Variable(tf.zeros([h2_size]),
-                             name="g_b2", dtype=tf.float32)
+            # w2 = tf.Variable(tf.truncated_normal(
+            #     [h1_size, h2_size], stddev=0.1),
+            #     name="g_w2",
+            #     dtype=tf.float32)
+
+            w2 = tf.get_variable(name="g_w2",
+                                 shape=[h1_size, h2_size],
+                                 dtype=tf.float32,
+                                 initializer=tf.truncated_normal_initializer())
+
+            # b2 = tf.Variable(tf.zeros([h2_size]),
+            #                  name="g_b2", dtype=tf.float32)
+
+            b2 = tf.get_variable(name="g_b2",
+                                 shape=[h2_size],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
+
             h2 = tf.nn.relu(tf.matmul(h1, w2) + b2)
 
             # Fully Connected Layer 3 (300 -> self._ndims)
-            w3 = tf.Variable(tf.truncated_normal(
-                [h2_size, self._ndims], stddev=0.1),
-                name="g_w3",
-                dtype=tf.float32)
-            b3 = tf.Variable(tf.zeros([self._ndims]),
-                             name="g_b3", dtype=tf.float32)
-            h3 = tf.matmul(h2, w3) + b3
+            # w3 = tf.Variable(tf.truncated_normal(
+            #     [h2_size, self._ndims], stddev=0.1),
+            #     name="g_w3",
+            #     dtype=tf.float32)
+
+            w3 = tf.get_variable(name="g_w3",
+                                 shape=[h2_size, self._ndims],
+                                 dtype=tf.float32,
+                                 initializer=tf.truncated_normal_initializer())
+
+            # b3 = tf.Variable(tf.zeros([self._ndims]),
+            #                  name="g_b3", dtype=tf.float32)
+
+            b3 = tf.get_variable(name="g_b3",
+                                 shape=[self._ndims],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
+
+            # h3 = tf.matmul(h2, w3) + b3
 
             # generated images
-            x_hat = tf.nn.tanh(h3)
+            x_hat = tf.nn.tanh(tf.matmul(h2, w3) + b3)
+
+            # print("w1", w1)
+            # print("b1", b1)
+            # print("h1", h1)
+            # print("")
+            # print("w2", w2)
+            # print("b2", b2)
+            # print("h2", h2)
+            # print("")
+            # print("w3", w3)
+            # print("b3", b3)
+            # print("h3", x_hat)
+            # print("")
 
             return x_hat
 
@@ -249,8 +312,12 @@ class Gan(object):
             l (tf.Scalar): average batch loss for the discriminator.
 
         """
-        l = - tf.reduce_mean(tf.log(y_hat), name="g_loss")
+        # l = tf.reduce_mean(tf.log(y_hat), name="g_loss")
+
         # l = -tf.log(y_hat)
+
+        l = -tf.reduce_mean(y_hat)
+
         return l
 
     def generate_samples(self, z_np):
