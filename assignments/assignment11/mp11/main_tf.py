@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 from models.gan import Gan
 
 
-def train(model, mnist_dataset, learning_rate=0.0001, batch_size=32,
-          num_steps=100):
+def train(model, mnist_dataset, learning_rate=0.0005, batch_size=16,
+          num_steps=1000):
     """Implement the training loop of stochastic gradient descent.
 
     Performs stochastic gradient descent with the indicated batch_size and
@@ -32,15 +32,26 @@ def train(model, mnist_dataset, learning_rate=0.0001, batch_size=32,
           (batch_size, num_steps, learning_rate))
     print('Start training...')
 
+    # train_writer = tf.summary.FileWriter('./logs/1/train', model.session.graph)
+
     # Training
     for step in range(0, num_steps):
         batch_x, _ = mnist_dataset.train.next_batch(batch_size)
         batch_z = np.random.uniform(-1, 1, [batch_size, 2])
 
+        # merge = tf.summary.merge_all()
+
         # Update discriminator by ascending its stochastic gradient
         for k in range(d_iters):
             # model.session.run(
             #     model.d_optimizer,
+            #     feed_dict={model.x_placeholder: batch_x,
+            #                model.z_placeholder: batch_z,
+            #                model.learning_rate_placeholder: learning_rate}
+            # )
+
+            # _, d_loss, summary = model.session.run(
+            #     [model.d_optimizer, model.d_loss, merge],
             #     feed_dict={model.x_placeholder: batch_x,
             #                model.z_placeholder: batch_z,
             #                model.learning_rate_placeholder: learning_rate}
@@ -54,12 +65,19 @@ def train(model, mnist_dataset, learning_rate=0.0001, batch_size=32,
             )
 
             print("d_loss: %f" % (d_loss))
+            # train_writer.add_summary(summary, step * d_iters + k)
 
         # Update generator by descending its stochastic gradient
-        batch_z = np.random.uniform(-1, 1, [batch_size, 2])
-        for k in range(g_iters):
+        # batch_z = np.random.uniform(-1, 1, [batch_size, 2])
+        for j in range(g_iters):
             # model.session.run(
             #     model.g_optimizer,
+            #     feed_dict={model.z_placeholder: batch_z,
+            #                model.learning_rate_placeholder: learning_rate}
+            # )
+
+            # _, g_loss, summary = model.session.run(
+            #     [model.g_optimizer, model.g_loss, merge],
             #     feed_dict={model.z_placeholder: batch_z,
             #                model.learning_rate_placeholder: learning_rate}
             # )
@@ -71,6 +89,7 @@ def train(model, mnist_dataset, learning_rate=0.0001, batch_size=32,
             )
 
             print("g_loss: %f" % (g_loss))
+            # train_writer.add_summary(summary, step * g_iters + j)
 
         if step % 100 == 0:
             print("Training step: %d out of total steps: %d" %
@@ -104,12 +123,13 @@ def main(_):
             out[x_idx * 28:(x_idx + 1) * 28,
                 y_idx * 28:(y_idx + 1) * 28] = img[0].reshape(28, 28)
     plt.imsave('gan.png', out, cmap="gray")
-    print(img[0].reshape(28, 28))
 
-    batch_x, _ = mnist_dataset.train.next_batch(16)
-    first_array = batch_x[0].reshape(28, 28)
-    print(first_array)
-    plt.imsave('fig.png', first_array, cmap="gray")
+    # print(img[0].reshape(28, 28))
+
+    # batch_x, _ = mnist_dataset.train.next_batch(16)
+    # first_array = batch_x[0].reshape(28, 28)
+    # print(first_array)
+    # plt.imsave('fig.png', first_array, cmap="gray")
 
 if __name__ == "__main__":
     tf.app.run()
