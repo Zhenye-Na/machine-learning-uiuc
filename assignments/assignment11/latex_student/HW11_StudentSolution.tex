@@ -1,105 +1,107 @@
 \newcommand{\GANStudSolA}{
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	%%
-	%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
-	%%
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\\
-	Original GAN minimizes a divergence/distance between probability distributions.
-	
-	$$\min_{G} \max_{D} V(D_{w}(x), G_{ \theta}(x)) = \mathbb{E}_{x \sim p_{data}}[\log D_{w}(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - D_{w}(G_{ \theta}(x)))]$$
-	\vspace{0cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\\
+Original GAN minimizes a divergence/distance between probability distributions.
+
+$$\min_{G} \max_{D} V(D_{w}(x), G_{ \theta}(x)) = \mathbb{E}_{x \sim p_{data}}[\log D_{w}(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - D_{w}(G_{ \theta}(x)))]$$
+\vspace{0cm}
 }
 
 \newcommand{\GANStudSolB}{
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	%%
-	%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
-	%%
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\begin{align}
-		\max_{D} V(G, D) &= \mathbb{E}_{x \sim p_{data}}[\log D_{w}(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - D_{w}(G_{ \theta}(x)))]\\
-		&= \mathbb{E}_{x \sim p_{data}} \bigg[ \log \frac{p_{data}(x)}{p_{data}(x) + p_{g}(x)} \bigg] + \mathbb{E}_{x \sim p_{g}} \bigg[ \log \frac{p_{g}(x)}{p_{data}(x) + p_{g}(x)} \bigg]
-	\end{align}
-	\vspace{0cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{align}
+\max_{D} V(G, D) &= \mathbb{E}_{x \sim p_{data}}[\log D_{w}(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - D_{w}(G_{ \theta}(x)))]\\
+&= \mathbb{E}_{x \sim p_{data}} \bigg[ \log \frac{p_{data}(x)}{p_{data}(x) + p_{g}(x)} \bigg] + \mathbb{E}_{x \sim p_{g}} \bigg[ \log \frac{p_{g}(x)}{p_{data}(x) + p_{g}(x)} \bigg]
+\end{align}
+\vspace{0cm}
 }
 
 \newcommand{\GANStudSolC}{
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	%%
-	%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
-	%%
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\\
-	The optimal discriminator $D^*(x)$ is given by fixed $G$ (generator). Given any $G$, maximize $V(G, D)$
-	\begin{align}
-		V(G, D) &= \int_{x}p_{data}(x)\log (D(x)) dx + \int_{z}p_{z}(z)\log (1 - D(g(z))) dz\\
-		&= \int_{x}p_{data}(x)\log (D(x)) + p_{g}(x) \log (1 - D(x))dx
-	\end{align}
-	The reason why transforming from Eq. (3) to Eq. (4) is since $x = g(z)$, we can replace $g(z)$ with variable $x$. Also in this case, $p_g$ is the distribution of $x$ (in generator).\\
-	\\For any $(a, b) \in \mathbb{R}^2 \backslash \{0, 0\}$, the function $y \rightarrow a \log (y) + b \log (1 - y)$ achieves its maximum in $[0,1]$ at $ \frac{a}{a + b}$. So the optimal discriminator $D^*(x)$ will be given by:
-	$$D^*(x) = \frac{p_{data}(x)}{p_{data}(x) + p_{g}(x)}$$
-	\vspace{0cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\\
+The optimal discriminator $D^*(x)$ is given by fixed $G$ (generator). Given any $G$, maximize $V(G, D)$
+\begin{align}
+V(G, D) &= \int_{x}p_{data}(x)\log (D(x)) dx + \int_{z}p_{z}(z)\log (1 - D(G(z))) dz\\
+&= \int_{x}p_{data}(x)\log (D(x)) + p_{g}(x) \log (1 - D(x))dx
+\end{align}
+The reason why transforming from Eq. (3) to Eq. (4) is since $x = g(z)$, we can replace $g(z)$ with variable $x$. Also in this case, $p_g$ is the distribution of $x$ (in generator).\\
+\\For any $(a, b) \in \mathbb{R}^2 \backslash \{0, 0\}$, the function $y \rightarrow a \log (y) + b \log (1 - y)$ achieves its maximum in $[0,1]$ at $ \frac{a}{a + b}$. So the optimal discriminator $D^*(x)$ will be given by:
+$$D^*(x) = \frac{p_{data}(x)}{p_{data}(x) + p_{g}(x)}$$
+\vspace{0cm}
 }
 
 \newcommand{\GANStudSolD}{
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	%%
-	%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
-	%%
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\\
-	For $p_G^* = p_{data}$, we can get $$D^*(x) = \frac{p_{data}(x)}{p_{data}(x) + p_{data}(x)} = \frac{1}{2},$$ so that $\max_{D} V(G, D) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4$\\
-	\\
-	From Eq. (2), we can get:
-	\begin{align}
-		\max_{D} V(G, D) &= \mathbb{E}_{x \sim p_{data}}[\log D^*(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - D^*(x)]\\
-		&= \mathbb{E}_{x \sim p_{data}} [- \log 2] + \mathbb{E}_{x \sim p_{g}} [- \log 2]\\
-		&= - \log 4
-	\end{align}
-	
-	Meanwhile, if we simply Eq. (2):
-	\begin{align}
-		C(G) &= \max_{D} V(G, D)\\
-		&= \mathbb{E}_{x \sim p_{data}} \bigg[ \log \frac{p_{data}(x)}{p_{data}(x) + p_G^*(x)} \bigg] + \mathbb{E}_{x \sim p_G^*} \bigg[ \log \frac{p_G^*(x)}{p_{data}(x) + p_G^*(x)} \bigg]\\
-		&= \int_x \Bigg( p_{data}(x) \log \Big( \frac{p_{data}(x)}{p_{data}(x) + p_G^*(x)} \Big)  + p_G^*(x) \log \Big( \frac{p_G^*(x)}{p_{data}(x) + p_G^*(x)} \Big)  \Bigg)dx\\
-		&= \int_x \Bigg( p_{data}(x) \log \Big( \frac{2p_{data}(x)}{p_{data}(x) + p_G^*(x)} \Big)  + p_G^*(x) \log \Big( \frac{2p_G^*(x)}{p_{data}(x) + p_G^*(x)} \Big)  \Bigg)dx -\log 4\\
-		&= - \log 4 + KL \bigg( p_{data} \Vert \frac{p_{data}(x) + p_G^*(x)}{2} \bigg) + KL \bigg( p_G^* \Vert \frac{p_{data}(x) + p_G^*(x)}{2} \bigg)\\
-		&= - \log 4 + 2 \cdot JSD(p_{data}, p_G^*)
-	\end{align}
-	
-	Since the Jensen-Shannon divergence between two distributions is always non-negative and equals to zero if and only if the two distributions are equal. So that if $C(G)$ wants to be the optimal value (global optimum), the only solution is:
-	$$p_G^* = p_{data}$$
-	\vspace{0cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\\
+For $p_G^* = p_{data}$, we can get $$D^*(x) = \frac{p_{data}(x)}{p_{data}(x) + p_{data}(x)} = \frac{1}{2},$$ so that $\max\limits_{D} V(G, D) = \log \frac{1}{2} + \log \frac{1}{2} = -\log 4$\\
+\\
+From Eq. (2), we can get:
+\begin{align}
+\max_{D} V(G, D) &= \mathbb{E}_{x \sim p_{data}}[\log D^*(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - D^*(x)]\\
+&= \mathbb{E}_{x \sim p_{data}} [- \log 2] + \mathbb{E}_{x \sim p_{g}} [- \log 2]\\
+&= - \log 4
+\end{align}
+
+Meanwhile, if we simply Eq. (2):
+\begin{align}
+C(G) &= \max_{D} V(G, D)\\
+&= \mathbb{E}_{x \sim p_{data}} \bigg[ \log \frac{p_{data}(x)}{p_{data}(x) + p_G^*(x)} \bigg] + \mathbb{E}_{x \sim p_G^*} \bigg[ \log \frac{p_G^*(x)}{p_{data}(x) + p_G^*(x)} \bigg]\\
+&= \int_x \Bigg( p_{data}(x) \log \Big( \frac{p_{data}(x)}{p_{data}(x) + p_G^*(x)} \Big)  + p_G^*(x) \log \Big( \frac{p_G^*(x)}{p_{data}(x) + p_G^*(x)} \Big)  \Bigg)dx\\
+&= \int_x \Bigg( p_{data}(x) \log \Big( \frac{2p_{data}(x)}{p_{data}(x) + p_G^*(x)} \Big)  + p_G^*(x) \log \Big( \frac{2p_G^*(x)}{p_{data}(x) + p_G^*(x)} \Big)  \Bigg)dx -\log 4\\
+&= - \log 4 + KL \bigg( p_{data} \Vert \frac{p_{data}(x) + p_G^*(x)}{2} \bigg) + KL \bigg( p_G^* \Vert \frac{p_{data}(x) + p_G^*(x)}{2} \bigg)\\
+&= - \log 4 + 2 \cdot JSD(p_{data}, p_G^*)
+\end{align}
+
+Since the Jensen-Shannon divergence between two distributions is always non-negative and equals to zero if and only if the two distributions are equal. So that if $C(G)$ wants to be the optimal value (global optimum), the only solution is:
+$$p_G^* = p_{data}$$
+\vspace{0cm}
 }
 
 \newcommand{\GANStudSolE}{
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	%%
-	%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
-	%%
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\begin{align*}
-		D_{KL}(\bP_1,\bP_2) &= \int \bP_1 \log \frac{\bP_1}{\bP_2}\\
-		&= 0
-	\end{align*}
-	\begin{align*}
-		D_{KL}(\bP_1,\bP_3) &= \int \bP_1 \log \frac{\bP_1}{\bP_3}\\
-		&= 0
-	\end{align*}
-	\begin{align*}
-		\bW_1(\bP_1,\bP_2) &= \sup_{f \in \mathcal{F}_L} \vert \mathbb{E}_{x \sim \bP_1}[f(x)] - \mathbb{E}_{y \sim \bP_2}[f(y)] \vert \\
-		&= \sup \vert f(x) - f(y) \vert \\
-		&= 0.5
-	\end{align*}
-	\begin{align*}
-		\bW_1(\bP_1,\bP_3) &= \sup_{f \in \mathcal{F}_L} \vert \mathbb{E}_{x \sim \bP_1}[f(x)] - \mathbb{E}_{y \sim \bP_3}[f(y)] \vert \\
-		&= \sup \vert f(x) - f(y) \vert \\
-		&= 1
-	\end{align*}
-	
-	where $f \in \mathcal{F}_L$, a natural class of smooth functions is the class of 1-Lipschitz functions, i.e.
-	$$\mathcal{F}_L = \{f:f\texttt{continuous}, \vert f(x) - f(y) \vert  \leq \| x - y \| \}$$
-	
-	\vspace{0cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{align*}
+D_{KL}(\bP_1,\bP_2) &= \int \bP_1 \log \frac{\bP_1}{\bP_2}\\
+&= 0
+\end{align*}
+\begin{align*}
+D_{KL}(\bP_1,\bP_3) &= \int \bP_1 \log \frac{\bP_1}{\bP_3}\\
+&= 0
+\end{align*}
+\begin{align*}
+\bW_1(\bP_1,\bP_2) &= \inf_{\gamma \in \Gamma(\mu, \nu)} \int_{M \times M} d(x,y) d \gamma (x, y)\\
+&= \sup_{f \in \mathcal{F}_L} \vert \mathbb{E}_{x \sim \bP_1}[f(x)] - \mathbb{E}_{y \sim \bP_2}[f(y)] \vert \\
+&= 0.5
+\end{align*}
+\begin{align*}
+\bW_1(\bP_1,\bP_3) &= \inf_{\gamma \in \Gamma(\mu, \nu)} \int_{M \times M} d(x,y) d \gamma (x, y)\\
+&= \sup_{f \in \mathcal{F}_L} \vert \mathbb{E}_{x \sim \bP_1}[f(x)] - \mathbb{E}_{y \sim \bP_3}[f(y)] \vert \\
+&= 1
+\end{align*}
+
+$ \Gamma (\mu ,\nu )$ denotes the collection of all measures on $M\times M$ with marginals $\mu$ and $\nu$ on the first and second factors respectively. (The set  $ \Gamma (\mu ,\nu )$ is also called the set of all couplings of $\mu$ and $\nu$.)
+
+$f \in \mathcal{F}_L$, a natural class of smooth functions is the class of 1-Lipschitz functions, i.e.
+$$\mathcal{F}_L = \{f:f\texttt{continuous}, \vert f(x) - f(y) \vert  \leq \| x - y \| \}$$
+
+\vspace{0cm}
 }
