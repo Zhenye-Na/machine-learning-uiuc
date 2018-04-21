@@ -7,7 +7,7 @@
 	\\
 	Original GAN minimizes a divergence/distance between probability distributions.
 	
-	$$\min_{G} \max_{D} V(D_{w}(x), G_{ \theta}(x)) = \mathbb{E}_{x \sim p_{data}}[\log D_{w}(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - G_{ \theta}(x))]$$
+	$$\min_{G} \max_{D} V(D_{w}(x), G_{ \theta}(x)) = \mathbb{E}_{x \sim p_{data}}[\log D_{w}(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - D_{w}(G_{ \theta}(x)))]$$
 	\vspace{0cm}
 }
 
@@ -18,7 +18,7 @@
 	%%
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\begin{align}
-		\max_{D} V(G, D) &= \mathbb{E}_{x \sim p_{data}}[\log D_{w}(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - G_{ \theta}(x))]\\
+		\max_{D} V(G, D) &= \mathbb{E}_{x \sim p_{data}}[\log D_{w}(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - D_{w}(G_{ \theta}(x)))]\\
 		&= \mathbb{E}_{x \sim p_{data}} \bigg[ \log \frac{p_{data}(x)}{p_{data}(x) + p_{g}(x)} \bigg] + \mathbb{E}_{x \sim p_{g}} \bigg[ \log \frac{p_{g}(x)}{p_{data}(x) + p_{g}(x)} \bigg]
 	\end{align}
 	\vspace{0cm}
@@ -88,14 +88,14 @@
 		&= 0
 	\end{align*}
 	\begin{align*}
-		\bW_1(\bP_1,\bP_2) &= \sup \vert \mathbb{E}_{x \sim \bP_1}[f(x)] - \mathbb{E}_{y \sim \bP_2}[f(y)] \vert \\
+		\bW_1(\bP_1,\bP_2) &= \sup_{f \in \mathcal{F}_L} \vert \mathbb{E}_{x \sim \bP_1}[f(x)] - \mathbb{E}_{y \sim \bP_2}[f(y)] \vert \\
 		&= \sup \vert f(x) - f(y) \vert \\
-		&= 1.5
+		&= 0.5
 	\end{align*}
 	\begin{align*}
-		\bW_1(\bP_1,\bP_3) &= \sup \vert \mathbb{E}_{x \sim \bP_1}[f(x)] - \mathbb{E}_{y \sim \bP_3}[f(y)] \vert \\
+		\bW_1(\bP_1,\bP_3) &= \sup_{f \in \mathcal{F}_L} \vert \mathbb{E}_{x \sim \bP_1}[f(x)] - \mathbb{E}_{y \sim \bP_3}[f(y)] \vert \\
 		&= \sup \vert f(x) - f(y) \vert \\
-		&= 2
+		&= 1
 	\end{align*}
 	
 	where $f \in \mathcal{F}_L$, a natural class of smooth functions is the class of 1-Lipschitz functions, i.e.
