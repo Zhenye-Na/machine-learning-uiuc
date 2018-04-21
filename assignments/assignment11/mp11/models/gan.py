@@ -37,12 +37,17 @@ class Gan(object):
         # Generator loss
         self.g_loss = self._generator_loss(y_hat)
 
-        # Add optimizers for appropriate variables
+        # Learning rate
         self.learning_rate_placeholder = tf.placeholder(tf.float32, [])
+
+        # Add optimizers for appropriate variables
         self.d_optimizer = tf.train.GradientDescentOptimizer(
-            learning_rate=self.learning_rate_placeholder, name='d_optimizer').minimize(self.d_loss)
+            learning_rate=self.learning_rate_placeholder,
+            name='d_optimizer').minimize(self.d_loss)
+
         self.g_optimizer = tf.train.GradientDescentOptimizer(
-            learning_rate=self.learning_rate_placeholder, name='g_optimizer').minimize(self.g_loss)
+            learning_rate=self.learning_rate_placeholder,
+            name='g_optimizer').minimize(self.g_loss)
 
         # Create session
         self.session = tf.InteractiveSession()
@@ -63,24 +68,29 @@ class Gan(object):
 
         """
         with tf.variable_scope("discriminator", reuse=reuse) as scope:
-            if reuse:
-                scope.reuse_variables()
+
+            # if reuse:
+            #     scope.reuse_variables()
 
             # Input Layer
             inputs = layers.fully_connected(
                 inputs=x, num_outputs=512, activation_fn=tf.nn.relu)
 
+            # Drop Out
+            drop_out1 = tf.layers.dropout(
+                inputs=inputs, rate=0.05)
+
             # Hidden Layer 1
             hidden1 = layers.fully_connected(
-                inputs=inputs, num_outputs=256, activation_fn=tf.nn.relu)
+                inputs=drop_out1, num_outputs=256, activation_fn=tf.nn.relu)
 
             # Drop Out
-            drop_out = tf.layers.dropout(
-                inputs=hidden1, rate=0.15, training=True)
+            drop_out2 = tf.layers.dropout(
+                inputs=hidden1, rate=0.05)
 
             # Hidden Layer 2
             hidden2 = layers.fully_connected(
-                inputs=drop_out, num_outputs=64, activation_fn=tf.nn.relu)
+                inputs=drop_out2, num_outputs=64, activation_fn=tf.nn.relu)
 
             # Output Layer
             y = layers.fully_connected(
@@ -100,12 +110,16 @@ class Gan(object):
             l (tf.Scalar): average batch loss for the discriminator.
 
         """
-        l = tf.reduce_mean(tf.reduce_sum(
-            tf.nn.sigmoid_cross_entropy_with_logits(labels=y,
-                                                    logits=y_hat,
-                                                    name="d_loss"), 1))
+        sigmoid_y = tf.sigmoid(y)
+        sigmoid_y_hat = tf.sigmoid(y_hat)
+        # l = tf.reduce_mean(
+        #     tf.nn.sigmoid_cross_entropy_with_logits(labels=y,
+        #                                             logits=y_hat,
+        #                                             name="d_loss"))
 
-        # l = tf.reduce_mean(tf.reduce_sum(tf.log(y) + tf.log(1 - y_hat), 1))
+        l = -tf.reduce_mean(tf.log(sigmoid_y) + tf.log(1 - sigmoid_y_hat))
+        # l = - (tf.log(y) + tf.log(1 - y_hat))
+
         return l
 
     def _generator(self, z, reuse=False):
@@ -120,8 +134,8 @@ class Gan(object):
         """
         with tf.variable_scope("generator", reuse=reuse) as scope:
 
-            if reuse:
-                scope.reuse_variables()
+            # if reuse:
+            #     scope.reuse_variables()
 
             # Input Layer
             inputs = layers.fully_connected(
@@ -131,17 +145,13 @@ class Gan(object):
             hidden1 = layers.fully_connected(
                 inputs=inputs, num_outputs=256, activation_fn=tf.nn.relu)
 
-            # Drop Out
-            drop_out = tf.layers.dropout(
-                inputs=hidden1, rate=0.15, training=True)
-
             # Hidden Layer 2
             hidden2 = layers.fully_connected(
-                inputs=drop_out, num_outputs=512, activation_fn=tf.nn.relu)
+                inputs=hidden1, num_outputs=512, activation_fn=tf.nn.relu)
 
             # Output Layer
             x_hat = layers.fully_connected(
-                inputs=hidden2, num_outputs=self._ndims, activation_fn=tf.nn.sigmoid)
+                inputs=hidden2, num_outputs=self._ndims, activation_fn=tf.nn.softplus)
 
             return x_hat
 
@@ -155,7 +165,8 @@ class Gan(object):
             l (tf.Scalar): average batch loss for the discriminator.
 
         """
-        l = tf.reduce_mean(tf.reduce_sum(y_hat, axis=1, name="g_loss"))
+        l = -tf.reduce_mean(y_hat, name="g_loss")
+        # l = -tf.log(y_hat)
         return l
 
     def generate_samples(self, z_np):
