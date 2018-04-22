@@ -28,8 +28,10 @@ class Gan(object):
 
         # Build graph.
         self.x_hat = self._generator(self.z_placeholder)
-        y_hat = self._discriminator(self.x_hat)
-        y = self._discriminator(self.x_placeholder, reuse=True)
+        # y_hat = self._discriminator(self.x_hat)
+        # y = self._discriminator(self.x_placeholder, reuse=True)
+        y = self._discriminator(self.x_placeholder, reuse=False)
+        y_hat = self._discriminator(self.x_hat, reuse=True)
 
         # Discriminator loss
         self.d_loss = self._discriminator_loss(y, y_hat)
@@ -42,11 +44,11 @@ class Gan(object):
 
         # AdamOptimizer  GradientDescentOptimizer
         # Add optimizers for appropriate variables
-        self.d_optimizer = tf.train.GradientDescentOptimizer(
+        self.d_optimizer = tf.train.AdamOptimizer(
             learning_rate=self.learning_rate_placeholder,
             name='d_optimizer').minimize(self.d_loss)
 
-        self.g_optimizer = tf.train.GradientDescentOptimizer(
+        self.g_optimizer = tf.train.AdamOptimizer(
             learning_rate=self.learning_rate_placeholder,
             name='g_optimizer').minimize(self.g_loss)
 
@@ -70,6 +72,7 @@ class Gan(object):
         """
         with tf.variable_scope("discriminator", reuse=reuse) as scope:
 
+            # ---------------------------------------------------------------#
             # # Input Layer
             # inputs = layers.fully_connected(
             #     inputs=x, num_outputs=512, activation_fn=tf.nn.relu)
@@ -94,59 +97,56 @@ class Gan(object):
             # y = layers.fully_connected(
             #     inputs=hidden2, num_outputs=1, activation_fn=None)
 
-            if reuse:
-                scope.reuse_variables()
+            # if reuse:
+            #     scope.reuse_variables()
+            # tf.truncated_normal_initializer()
 
-            keep_prob = 0.9
-            num_h1 = 256
-            num_h2 = 128
+            # ---------------------------------------------------------------#
 
-            # Fully Connected Layer 1 (784 -> 200) , dropout
-            w1 = tf.get_variable(name="d_w1",
-                                 shape=[self._ndims, num_h1],
-                                 dtype=tf.float32,
-                                 initializer=tf.truncated_normal_initializer())
+            # keep_prob = 0.85
+            # num_h1 = 392
+            # num_h2 = 196
 
-            b1 = tf.get_variable(name="d_b1",
-                                 shape=[num_h1],
-                                 dtype=tf.float32,
-                                 initializer=tf.zeros_initializer())
+            # # Fully Connected Layer 1, dropout
+            # w1 = tf.get_variable(name="d_w1",
+            #                      shape=[self._ndims, num_h1],
+            #                      dtype=tf.float32,
+            #                      initializer=layers.xavier_initializer(uniform=False))
 
-            h1 = tf.nn.dropout(tf.nn.relu(tf.matmul(x, w1) + b1), keep_prob)
+            # b1 = tf.get_variable(name="d_b1",
+            #                      shape=[num_h1],
+            #                      dtype=tf.float32,
+            #                      initializer=tf.zeros_initializer())
 
-            # Fully Connected Layer 2 (200  -> 150 ) , dropout
-            w2 = tf.get_variable(name="d_w2",
-                                 shape=[num_h1, num_h2],
-                                 dtype=tf.float32,
-                                 initializer=tf.truncated_normal_initializer())
+            # h1 = tf.nn.dropout(tf.nn.relu(tf.matmul(x, w1) + b1), keep_prob)
 
-            # b2 = tf.Variable(tf.zeros([h1_size]),
-            #                  name="d_b2", dtype=tf.float32)
+            # # Fully Connected Layer 2 (200  -> 150 ) , dropout
 
-            b2 = tf.get_variable(name="d_b2",
-                                 shape=[num_h2],
-                                 dtype=tf.float32,
-                                 initializer=tf.zeros_initializer())
+            # w2 = tf.get_variable(name="d_w2",
+            #                      shape=[num_h1, num_h2],
+            #                      dtype=tf.float32,
+            #                      initializer=layers.xavier_initializer(uniform=False))
 
-            h2 = tf.nn.dropout(tf.nn.relu(tf.matmul(h1, w2) + b2), keep_prob)
+            # b2 = tf.get_variable(name="d_b2",
+            #                      shape=[num_h2],
+            #                      dtype=tf.float32,
+            #                      initializer=tf.zeros_initializer())
 
-            # Fully Connected Layer 3 (150 (h1_size) -> 1)
-            # w3 = tf.Variable(tf.truncated_normal(
-            #     [h1_size, 1], stddev=0.1), name="d_w3", dtype=tf.float32)
+            # h2 = tf.nn.dropout(tf.nn.relu(tf.matmul(h1, w2) + b2), keep_prob)
 
-            w3 = tf.get_variable(name="d_w3",
-                                 shape=[num_h2, 1],
-                                 dtype=tf.float32,
-                                 initializer=tf.truncated_normal_initializer())
+            # # Fully Connected Layer 3
 
-            # b3 = tf.Variable(tf.zeros([1]), name="d_b3", dtype=tf.float32)
+            # w3 = tf.get_variable(name="d_w3",
+            #                      shape=[num_h2, 1],
+            #                      dtype=tf.float32,
+            #                      initializer=layers.xavier_initializer(uniform=False))
 
-            b3 = tf.get_variable(name="d_b3",
-                                 shape=[1],
-                                 dtype=tf.float32,
-                                 initializer=tf.zeros_initializer())
+            # b3 = tf.get_variable(name="d_b3",
+            #                      shape=[1],
+            #                      dtype=tf.float32,
+            #                      initializer=tf.zeros_initializer())
 
-            y = tf.matmul(h2, w3) + b3
+            # y = tf.matmul(h2, w3) + b3  # logits
 
             # print("w1", w1)
             # print("b1", b1)
@@ -160,6 +160,20 @@ class Gan(object):
             # print("b3", b3)
             # print("h3", y)
             # print("")
+
+            # ---------------------------------------------------------------#
+
+            n_units = 392
+            alpha = 0.01
+
+            # Hidden layer
+            h1 = tf.layers.dense(x, n_units, activation=None)
+            # Leaky ReLU
+            h1 = tf.maximum(h1, alpha * h1)
+
+            # logits
+            y = tf.layers.dense(h1, 1, activation=None)
+            # out = tf.nn.sigmoid(logits)
 
         return y
 
@@ -181,12 +195,33 @@ class Gan(object):
 
         # l = - (tf.log(y) + tf.log(1 - y_hat))
 
-        # l = -tf.reduce_mean(
-        #     tf.nn.sigmoid_cross_entropy_with_logits(labels=y,
+        # l = tf.reduce_mean(
+        #     tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.Variable(tf.ones_like(self.y), name="labels_real"),
+        #                                             logits=y,
+        #                                             name="d_loss") +
+        #     tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.Variable(tf.zeros_like(self.y_hat), name="labels_fake"),
         #                                             logits=y_hat,
         #                                             name="d_loss"))
 
-        l = tf.reduce_mean(y_hat) - tf.reduce_mean(y)
+        # Label smoothing
+        # smooth = 0.1
+        # * (1 - smooth)
+
+        d_labels_real = tf.ones_like(y)
+        d_labels_fake = tf.zeros_like(y_hat)
+
+        # d_loss_real = tf.reduce_mean(
+        #     tf.nn.sigmoid_cross_entropy_with_logits(logits=y, labels=d_labels_real))
+        # d_loss_fake = tf.reduce_mean(
+        #     tf.nn.sigmoid_cross_entropy_with_logits(logits=y_hat, labels=d_labels_fake))
+
+        d_loss_real = tf.nn.sigmoid_cross_entropy_with_logits(
+            logits=y, labels=d_labels_real)
+        d_loss_fake = tf.nn.sigmoid_cross_entropy_with_logits(
+            logits=y_hat, labels=d_labels_fake)
+
+        l = tf.reduce_mean(d_loss_fake + d_loss_real)
+        # l = tf.reduce_mean(y_hat) - tf.reduce_mean(y)
 
         return l
 
@@ -194,14 +229,15 @@ class Gan(object):
         """From a sampled z, generate an image.
 
         Args:
-            z(tf.Tensor): z from _sample_z of dimension (None, 2).
-            reuse (Boolean): re use variables with same name in scope instead
+            z(tf.Tensor): z from _sample_z of dimension (None, nlatent).
+            reuse (Boolean): reuse variables with same name in scope instead
                 of creating new ones, check Tensorflow documentation
         Returns:
             x_hat(tf.Tensor): Fake image G(z) (None, 784).
         """
         with tf.variable_scope("generator", reuse=reuse) as scope:
 
+            # ---------------------------------------------------------------#
             # # Input Layer
             # inputs = layers.fully_connected(
             #     inputs=z, num_outputs=64, activation_fn=tf.nn.relu)
@@ -216,76 +252,59 @@ class Gan(object):
 
             # # Output Layer
             # x_hat = layers.fully_connected(
-            #     inputs=hidden2, num_outputs=self._ndims, activation_fn=tf.nn.softplus)
+            #       inputs=hidden2, num_outputs=self._ndims, activation_fn=tf.nn.softplus)
 
-            h1_size = 150
-            h2_size = 300
+            # if reuse:
+            #     scope.reuse_variables()
 
-            # Fully Connected Layer 1 (100 (latent-vector) -> 150 (h1_size))
-            # w1 = tf.Variable(tf.truncated_normal(
-            #     [self._nlatent, h1_size], stddev=0.1),
-            #     name="g_w1",
-            #     dtype=tf.float32)
+            # tf.truncated_normal_initializer()
 
-            w1 = tf.get_variable(name="g_w1",
-                                 shape=[self._nlatent, h1_size],
-                                 dtype=tf.float32,
-                                 initializer=tf.truncated_normal_initializer())
+            # ---------------------------------------------------------------#
 
-            # b1 = tf.Variable(tf.zeros([h1_size]),
-            #                  name="g_b1", dtype=tf.float32)
+            # h1_size = 196
+            # h2_size = 392
 
-            b1 = tf.get_variable(name="g_b1",
-                                 shape=[h1_size],
-                                 dtype=tf.float32,
-                                 initializer=tf.zeros_initializer())
+            # # Fully Connected Layer 1
 
-            h1 = tf.nn.relu(tf.matmul(z, w1) + b1)
+            # w1 = tf.get_variable(name="g_w1",
+            #                      shape=[self._nlatent, h1_size],
+            #                      dtype=tf.float32,
+            #                      initializer=layers.xavier_initializer(uniform=False))
 
-            # Fully Connected Layer 2 (150 (h1_size) -> 300 (h2_size))
-            # w2 = tf.Variable(tf.truncated_normal(
-            #     [h1_size, h2_size], stddev=0.1),
-            #     name="g_w2",
-            #     dtype=tf.float32)
+            # b1 = tf.get_variable(name="g_b1",
+            #                      shape=[h1_size],
+            #                      dtype=tf.float32,
+            #                      initializer=tf.zeros_initializer())
 
-            w2 = tf.get_variable(name="g_w2",
-                                 shape=[h1_size, h2_size],
-                                 dtype=tf.float32,
-                                 initializer=tf.truncated_normal_initializer())
+            # h1 = tf.nn.relu(tf.matmul(z, w1) + b1)
 
-            # b2 = tf.Variable(tf.zeros([h2_size]),
-            #                  name="g_b2", dtype=tf.float32)
+            # # Fully Connected Layer 2
 
-            b2 = tf.get_variable(name="g_b2",
-                                 shape=[h2_size],
-                                 dtype=tf.float32,
-                                 initializer=tf.zeros_initializer())
+            # w2 = tf.get_variable(name="g_w2",
+            #                      shape=[h1_size, h2_size],
+            #                      dtype=tf.float32,
+            #                      initializer=layers.xavier_initializer(uniform=False))
 
-            h2 = tf.nn.relu(tf.matmul(h1, w2) + b2)
+            # b2 = tf.get_variable(name="g_b2",
+            #                      shape=[h2_size],
+            #                      dtype=tf.float32,
+            #                      initializer=tf.zeros_initializer())
 
-            # Fully Connected Layer 3 (300 -> self._ndims)
-            # w3 = tf.Variable(tf.truncated_normal(
-            #     [h2_size, self._ndims], stddev=0.1),
-            #     name="g_w3",
-            #     dtype=tf.float32)
+            # h2 = tf.nn.relu(tf.matmul(h1, w2) + b2)
 
-            w3 = tf.get_variable(name="g_w3",
-                                 shape=[h2_size, self._ndims],
-                                 dtype=tf.float32,
-                                 initializer=tf.truncated_normal_initializer())
+            # # Fully Connected Layer 3
 
-            # b3 = tf.Variable(tf.zeros([self._ndims]),
-            #                  name="g_b3", dtype=tf.float32)
+            # w3 = tf.get_variable(name="g_w3",
+            #                      shape=[h2_size, self._ndims],
+            #                      dtype=tf.float32,
+            #                      initializer=layers.xavier_initializer(uniform=False))
 
-            b3 = tf.get_variable(name="g_b3",
-                                 shape=[self._ndims],
-                                 dtype=tf.float32,
-                                 initializer=tf.zeros_initializer())
+            # b3 = tf.get_variable(name="g_b3",
+            #                      shape=[self._ndims],
+            #                      dtype=tf.float32,
+            #                      initializer=tf.zeros_initializer())
 
-            # h3 = tf.matmul(h2, w3) + b3
-
-            # generated images
-            x_hat = tf.nn.tanh(tf.matmul(h2, w3) + b3)
+            # logit = tf.matmul(h2, w3) + b3
 
             # print("w1", w1)
             # print("b1", b1)
@@ -300,6 +319,20 @@ class Gan(object):
             # print("h3", x_hat)
             # print("")
 
+            # ---------------------------------------------------------------#
+
+            alpha = 0.01
+            n_units = 392
+            # Hidden layer
+            h1 = tf.layers.dense(z, n_units, activation=None)
+
+            # Leaky ReLU
+            h1 = tf.maximum(h1, alpha * h1)
+
+            # Logits and tanh output
+            x_hat = tf.layers.dense(h1, self._ndims, activation=None)
+            # x_hat = tf.nn.sigmoid(logits)
+
             return x_hat
 
     def _generator_loss(self, y_hat):
@@ -309,14 +342,24 @@ class Gan(object):
             y_hat (tf.Tensor): The output tensor of the discriminator for fake
                 images of dimension (None, 1).
         Returns:
-            l (tf.Scalar): average batch loss for the discriminator.
+            l (tf.Scalar): average batch loss for the generator.
 
         """
         # l = tf.reduce_mean(tf.log(y_hat), name="g_loss")
 
         # l = -tf.log(y_hat)
 
-        l = -tf.reduce_mean(y_hat)
+        # l = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.Variable(tf.ones([16, 1]), name="labels"),
+        #                                                            logits=y_hat,
+        #                                                            name="d_loss"))
+
+        l = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
+            logits=y_hat, labels=tf.ones_like(y_hat)))
+
+        # l = tf.reduce_mean(
+        #     tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.Variable(tf.ones([16, 1]),name="labels", dtype=tf.float32),
+        #                                             logits=y_hat,
+        #                                             name="d_loss"))
 
         return l
 
