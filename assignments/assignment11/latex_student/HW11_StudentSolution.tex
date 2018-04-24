@@ -34,11 +34,11 @@ $$\min_{G} \max_{D} V(D_{w}(x), G_{ \theta}(x)) = \mathbb{E}_{x \sim p_{data}}[\
 The optimal discriminator $D^*(x)$ is given by fixed $G$ (generator). Given any $G$, maximize $V(G, D)$
 \begin{align}
 V(G, D) &= \int_{x}p_{data}(x)\log (D(x)) dx + \int_{z}p_{z}(z)\log (1 - D(G(z))) dz\\
-&= \int_{x}p_{data}(x)\log (D(x)) + p_{g}(x) \log (1 - D(x))dx
+&= \int_{x}p_{data}(x)\log (D(x)) + p_{G}(x) \log (1 - D(x))dx
 \end{align}
-The reason why transforming from Eq. (3) to Eq. (4) is since $x = g(z)$, we can replace $g(z)$ with variable $x$. Also in this case, $p_g$ is the distribution of $x$ (in generator).\\
+The reason why transforming from Eq. (3) to Eq. (4) is since $x = G(z)$, we can replace $G(z)$ with variable $x$. Also in this case, $p_g$ is the distribution of $x$ (in generator).\\
 \\For any $(a, b) \in \mathbb{R}^2 \backslash \{0, 0\}$, the function $y \rightarrow a \log (y) + b \log (1 - y)$ achieves its maximum in $[0,1]$ at $ \frac{a}{a + b}$. So the optimal discriminator $D^*(x)$ will be given by:
-$$D^*(x) = \frac{p_{data}(x)}{p_{data}(x) + p_{g}(x)}$$
+$$D^*(x) = \frac{p_{data}(x)}{p_{data}(x) + p_{G}(x)}$$
 \vspace{0cm}
 }
 
@@ -53,8 +53,8 @@ For $p_G^* = p_{data}$, we can get $$D^*(x) = \frac{p_{data}(x)}{p_{data}(x) + p
 \\
 From Eq. (2), we can get:
 \begin{align}
-\max_{D} V(G, D) &= \mathbb{E}_{x \sim p_{data}}[\log D^*(x)] + \mathbb{E}_{x \sim p_{g}}[\log (1 - D^*(x)]\\
-&= \mathbb{E}_{x \sim p_{data}} [- \log 2] + \mathbb{E}_{x \sim p_{g}} [- \log 2]\\
+\max_{D} V(G, D) &= \mathbb{E}_{x \sim p_{data}}[\log D^*(x)] + \mathbb{E}_{x \sim p_{G}}[\log (1 - D^*(x)]\\
+&= \mathbb{E}_{x \sim p_{data}} [- \log 2] + \mathbb{E}_{x \sim p_{G}} [- \log 2]\\
 &= - \log 4
 \end{align}
 
