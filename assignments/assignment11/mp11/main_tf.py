@@ -8,7 +8,7 @@ from models.gan import Gan
 
 
 def train(model, mnist_dataset, learning_rate=0.0005, batch_size=16,
-          num_steps=1000):
+          num_steps=5000):
     """Implement the training loop of stochastic gradient descent.
 
     Performs stochastic gradient descent with the indicated batch_size and
@@ -32,30 +32,20 @@ def train(model, mnist_dataset, learning_rate=0.0005, batch_size=16,
           (batch_size, num_steps, learning_rate))
     print('Start training...')
 
-    # train_writer = tf.summary.FileWriter('./logs/1/train', model.session.graph)
+    # Loss
+    loss_g = []
+    loss_d = []
 
     # Training
-    for step in range(0, num_steps):
+    for step in range(num_steps):
         batch_x, _ = mnist_dataset.train.next_batch(batch_size)
-        batch_z = np.random.uniform(-1, 1, [batch_size, 2])
+        batch_z = np.random.uniform(-1., 1.,
+                                    [batch_size, model._nlatent]).astype(np.float32)
 
         # merge = tf.summary.merge_all()
 
         # Update discriminator by ascending its stochastic gradient
         for k in range(d_iters):
-            # model.session.run(
-            #     model.d_optimizer,
-            #     feed_dict={model.x_placeholder: batch_x,
-            #                model.z_placeholder: batch_z,
-            #                model.learning_rate_placeholder: learning_rate}
-            # )
-
-            # _, d_loss, summary = model.session.run(
-            #     [model.d_optimizer, model.d_loss, merge],
-            #     feed_dict={model.x_placeholder: batch_x,
-            #                model.z_placeholder: batch_z,
-            #                model.learning_rate_placeholder: learning_rate}
-            # )
 
             _, d_loss = model.session.run(
                 [model.d_optimizer, model.d_loss],
@@ -64,23 +54,10 @@ def train(model, mnist_dataset, learning_rate=0.0005, batch_size=16,
                            model.learning_rate_placeholder: learning_rate}
             )
 
-            print("d_loss: %f" % (d_loss))
-            # train_writer.add_summary(summary, step * d_iters + k)
+            loss_d.append(d_loss)
 
         # Update generator by descending its stochastic gradient
-        # batch_z = np.random.uniform(-1, 1, [batch_size, 2])
         for j in range(g_iters):
-            # model.session.run(
-            #     model.g_optimizer,
-            #     feed_dict={model.z_placeholder: batch_z,
-            #                model.learning_rate_placeholder: learning_rate}
-            # )
-
-            # _, g_loss, summary = model.session.run(
-            #     [model.g_optimizer, model.g_loss, merge],
-            #     feed_dict={model.z_placeholder: batch_z,
-            #                model.learning_rate_placeholder: learning_rate}
-            # )
 
             _, g_loss = model.session.run(
                 [model.g_optimizer, model.g_loss],
@@ -88,12 +65,26 @@ def train(model, mnist_dataset, learning_rate=0.0005, batch_size=16,
                            model.learning_rate_placeholder: learning_rate}
             )
 
-            print("g_loss: %f" % (g_loss))
-            # train_writer.add_summary(summary, step * g_iters + j)
+            loss_g.append(g_loss)
 
         if step % 100 == 0:
-            print("Training step: %d out of total steps: %d" %
-                  (step, num_steps))
+            print('Iter: {}'.format(step))
+            print('D_loss: {:.4}'.format(d_loss))
+            print('G_loss: {:.4}'.format(g_loss))
+
+    #     if step % 50 == 0:
+    #         out = np.empty((28 * 20, 28 * 20))
+    #         for x_idx in range(20):
+    #             for y_idx in range(20):
+    #                 z_mu = np.random.uniform(-1., 1.,
+    #                                          [16, model._nlatent]).astype(np.float32)
+    #                 img = model.generate_samples(z_mu)
+    #                 out[x_idx * 28:(x_idx + 1) * 28,
+    #                     y_idx * 28:(y_idx + 1) * 28] = img[0].reshape(28, 28)
+    #         plt.imsave('./tmp/gan_' + str(step) + '.png', out, cmap="gray")
+
+    # np.savetxt("loss_g", np.array(loss_g), delimiter=',')
+    # np.savetxt("loss_d", np.array(loss_d), delimiter=',')
 
 
 def main(_):
@@ -105,31 +96,22 @@ def main(_):
     mnist_dataset = input_data.read_data_sets('MNIST_data', one_hot=True)
 
     # Build model.
-    model = Gan()
+    model = Gan(nlatent=10)
 
     # Start training
     train(model, mnist_dataset)
 
     # Plot
-    x_z = np.random.uniform(-1, 1, 20)
-    y_z = np.random.uniform(-1, 1, 20)
-
     out = np.empty((28 * 20, 28 * 20))
-    for x_idx, x in enumerate(x_z):
-        for y_idx, y in enumerate(y_z):
-            z_mu = np.array([[y, x]])
+    for x_idx in range(20):
+        for y_idx in range(20):
+            z_mu = np.random.uniform(-1., 1.,
+                                     [16, model._nlatent]).astype(np.float32)
             img = model.generate_samples(z_mu)
-            # print(img.shape)
             out[x_idx * 28:(x_idx + 1) * 28,
                 y_idx * 28:(y_idx + 1) * 28] = img[0].reshape(28, 28)
     plt.imsave('gan.png', out, cmap="gray")
 
-    # print(img[0].reshape(28, 28))
-
-    # batch_x, _ = mnist_dataset.train.next_batch(16)
-    # first_array = batch_x[0].reshape(28, 28)
-    # print(first_array)
-    # plt.imsave('fig.png', first_array, cmap="gray")
 
 if __name__ == "__main__":
     tf.app.run()
