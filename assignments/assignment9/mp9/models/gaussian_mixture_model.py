@@ -2,7 +2,7 @@
 import numpy as np
 import scipy
 from scipy.stats import multivariate_normal
-from scipy.cluster.vq import kmeans2
+# from scipy.cluster.vq import kmeans2
 
 
 class GaussianMixtureModel(object):
@@ -50,7 +50,8 @@ class GaussianMixtureModel(object):
             x(numpy.ndarray): Feature array of dimension (N, ndims).
         """
         # self._mu, _ = kmeans2(x, self._n_components)
-        self._mu = x[np.random.choice(x.shape[0], size=self._n_components, replace=False), :]
+        self._mu = x[np.random.choice(
+            x.shape[0], size=self._n_components, replace=False), :]
 
         for iters in range(self._max_iter):
             z_ik = self._e_step(x)
@@ -106,7 +107,7 @@ class GaussianMixtureModel(object):
         # Update for sigma (n_components, n_dims, n_dims)
         new_sigma = np.zeros_like(self._sigma)
         sigma_down = np.sum(z_ik, axis=0)
-        reg = np.zeros((x.shape[1], x.shape[1]))
+        reg = np.zeros((self._n_dims, self._n_dims))
         np.fill_diagonal(reg, self._reg_covar)
 
         for k in range(self._n_components):
@@ -114,7 +115,8 @@ class GaussianMixtureModel(object):
             # sigma_k = np.zeros((self._n_dims, self._n_dims))
             # for i in range(x.shape[0]):
             #     sigma_k += z_ik[i, k] * np.diag(self._reg_covar +
-            #                                     np.diag(np.outer(x[i, :] - mu_k, x[i, :] - mu_k)))
+            #                                     np.diag(np.outer(x[i, :]
+            #                                    - mu_k, x[i, :] - mu_k)))
             # new_sigma[k] = sigma_k / sigma_down[k]
             x_demean = x - self._mu[k, :]
             sigma_up = z_ik[:, k][:, np.newaxis] * x_demean
@@ -132,9 +134,6 @@ class GaussianMixtureModel(object):
             response(numpy.ndarray): The conditional probability for each example,
                 dimension (N, n_components).
         """
-        # self._mu = np.random.rand(self._n_components, self._n_dims)
-        # self._mu = x[np.random.choice(x.shape[0], self._n_components, False), :]
-
         # response = np.zeros((x.shape[0], self._n_components))
         response = []
 
@@ -177,9 +176,6 @@ class GaussianMixtureModel(object):
             z_ik(numpy.ndarray): Array containing the posterior probability
                 of each example, dimension (N, n_components).
         """
-        # Initialize z_{ik}
-        # z_ik = np.zeros((x.shape[0], self._n_components))
-
         # get conditional probability
         conditions = self.get_conditional(x)
 
@@ -255,7 +251,6 @@ class GaussianMixtureModel(object):
             y_hat(numpy.ndarray): Array containing the predicted label for each
             x, dimension (N,)
         """
-        # self.fit(x)
         z_ik = self.get_posterior(x)
         em_label = np.argmax(z_ik, axis=1)
         y_hat = [self.cluster_label_map[idx] for idx in em_label]
