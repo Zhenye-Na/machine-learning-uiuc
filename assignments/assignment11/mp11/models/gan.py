@@ -28,10 +28,8 @@ class Gan(object):
 
         # Build graph.
         self.x_hat = self._generator(self.z_placeholder)
-        # y_hat = self._discriminator(self.x_hat)
-        # y = self._discriminator(self.x_placeholder, reuse=True)
-        y = self._discriminator(self.x_placeholder, reuse=False)
-        y_hat = self._discriminator(self.x_hat, reuse=True)
+        y_hat = self._discriminator(self.x_hat)
+        y = self._discriminator(self.x_placeholder, reuse=True)
 
         # Discriminator loss
         self.d_loss = self._discriminator_loss(y, y_hat)
@@ -42,15 +40,18 @@ class Gan(object):
         # Learning rate
         self.learning_rate_placeholder = tf.placeholder(tf.float32, [])
 
-        # AdamOptimizer  GradientDescentOptimizer
         # Add optimizers for appropriate variables
+        d_vars = tf.get_collection(
+            tf.GraphKeys.TRAINABLE_VARIABLES, "discriminator")
         self.d_optimizer = tf.train.AdamOptimizer(
             learning_rate=self.learning_rate_placeholder,
-            name='d_optimizer').minimize(self.d_loss)
+            name='d_optimizer').minimize(self.d_loss, var_list=d_vars)
 
+        g_vars = tf.get_collection(
+            tf.GraphKeys.TRAINABLE_VARIABLES, "generator")
         self.g_optimizer = tf.train.AdamOptimizer(
             learning_rate=self.learning_rate_placeholder,
-            name='g_optimizer').minimize(self.g_loss)
+            name='g_optimizer').minimize(self.g_loss, var_list=g_vars)
 
         # Create session
         self.session = tf.InteractiveSession()
@@ -91,7 +92,7 @@ class Gan(object):
 
             # # Hidden Layer 2
             # hidden2 = layers.fully_connected(
-            #     inputs=drop_out, num_outputs=64, activation_fn=tf.nn.relu)
+            #     inputs=drop_out, num_outputs=128, activation_fn=tf.nn.relu)
 
             # # Output Layer
             # y = layers.fully_connected(
@@ -148,19 +149,6 @@ class Gan(object):
 
             # y = tf.matmul(h2, w3) + b3  # logits
 
-            # print("w1", w1)
-            # print("b1", b1)
-            # print("h1", h1)
-            # print("")
-            # print("w2", w2)
-            # print("b2", b2)
-            # print("h2", h2)
-            # print("")
-            # print("w3", w3)
-            # print("b3", b3)
-            # print("h3", y)
-            # print("")
-
             # ---------------------------------------------------------------#
 
             n_units = 392
@@ -173,7 +161,6 @@ class Gan(object):
 
             # logits
             y = tf.layers.dense(h1, 1, activation=None)
-            # out = tf.nn.sigmoid(logits)
 
         return y
 
@@ -189,39 +176,20 @@ class Gan(object):
             l (tf.Scalar): average batch loss for the discriminator.
 
         """
-        # sigmoid_y = tf.nn.sigmoid(y)
-        # sigmoid_y_hat = tf.nn.sigmoid(y_hat)
-        # l = tf.reduce_mean(- tf.log(sigmoid_y) + tf.log(1 - sigmoid_y_hat))
-
-        # l = - (tf.log(y) + tf.log(1 - y_hat))
-
-        # l = tf.reduce_mean(
-        #     tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.Variable(tf.ones_like(self.y), name="labels_real"),
-        #                                             logits=y,
-        #                                             name="d_loss") +
-        #     tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.Variable(tf.zeros_like(self.y_hat), name="labels_fake"),
-        #                                             logits=y_hat,
-        #                                             name="d_loss"))
-
         # Label smoothing
         # smooth = 0.1
-        # * (1 - smooth)
 
+        # create labels for discriminator
         d_labels_real = tf.ones_like(y)
         d_labels_fake = tf.zeros_like(y_hat)
 
-        # d_loss_real = tf.reduce_mean(
-        #     tf.nn.sigmoid_cross_entropy_with_logits(logits=y, labels=d_labels_real))
-        # d_loss_fake = tf.reduce_mean(
-        #     tf.nn.sigmoid_cross_entropy_with_logits(logits=y_hat, labels=d_labels_fake))
-
+        # compute loss for real/fake images
         d_loss_real = tf.nn.sigmoid_cross_entropy_with_logits(
             logits=y, labels=d_labels_real)
         d_loss_fake = tf.nn.sigmoid_cross_entropy_with_logits(
             logits=y_hat, labels=d_labels_fake)
 
         l = tf.reduce_mean(d_loss_fake + d_loss_real)
-        # l = tf.reduce_mean(y_hat) - tf.reduce_mean(y)
 
         return l
 
@@ -240,7 +208,7 @@ class Gan(object):
             # ---------------------------------------------------------------#
             # # Input Layer
             # inputs = layers.fully_connected(
-            #     inputs=z, num_outputs=64, activation_fn=tf.nn.relu)
+            #     inputs=z, num_outputs=128, activation_fn=tf.nn.relu)
 
             # # Hidden Layer 1
             # hidden1 = layers.fully_connected(
@@ -252,7 +220,7 @@ class Gan(object):
 
             # # Output Layer
             # x_hat = layers.fully_connected(
-            #       inputs=hidden2, num_outputs=self._ndims, activation_fn=tf.nn.softplus)
+            #     inputs=hidden2, num_outputs=self._ndims, activation_fn=tf.nn.softplus)
 
             # if reuse:
             #     scope.reuse_variables()
@@ -304,34 +272,21 @@ class Gan(object):
             #                      dtype=tf.float32,
             #                      initializer=tf.zeros_initializer())
 
-            # logit = tf.matmul(h2, w3) + b3
-
-            # print("w1", w1)
-            # print("b1", b1)
-            # print("h1", h1)
-            # print("")
-            # print("w2", w2)
-            # print("b2", b2)
-            # print("h2", h2)
-            # print("")
-            # print("w3", w3)
-            # print("b3", b3)
-            # print("h3", x_hat)
-            # print("")
+            # x_hat = tf.matmul(h2, w3) + b3
 
             # ---------------------------------------------------------------#
 
             alpha = 0.01
             n_units = 392
+
             # Hidden layer
             h1 = tf.layers.dense(z, n_units, activation=None)
 
             # Leaky ReLU
             h1 = tf.maximum(h1, alpha * h1)
 
-            # Logits and tanh output
+            # Logits
             x_hat = tf.layers.dense(h1, self._ndims, activation=None)
-            # x_hat = tf.nn.sigmoid(logits)
 
             return x_hat
 
@@ -345,21 +300,11 @@ class Gan(object):
             l (tf.Scalar): average batch loss for the generator.
 
         """
-        # l = tf.reduce_mean(tf.log(y_hat), name="g_loss")
-
-        # l = -tf.log(y_hat)
-
-        # l = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.Variable(tf.ones([16, 1]), name="labels"),
-        #                                                            logits=y_hat,
-        #                                                            name="d_loss"))
+        # create labels for generator
+        labels = tf.ones_like(y_hat)
 
         l = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
-            logits=y_hat, labels=tf.ones_like(y_hat)))
-
-        # l = tf.reduce_mean(
-        #     tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.Variable(tf.ones([16, 1]),name="labels", dtype=tf.float32),
-        #                                             logits=y_hat,
-        #                                             name="d_loss"))
+            logits=y_hat, labels=labels))
 
         return l
 
