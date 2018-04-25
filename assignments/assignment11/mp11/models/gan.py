@@ -104,63 +104,61 @@ class Gan(object):
 
             # ---------------------------------------------------------------#
 
-            # keep_prob = 0.85
-            # num_h1 = 392
-            # num_h2 = 196
+            keep_prob = 0.85
+            num_h1 = 392
+            num_h2 = 196
 
-            # # Fully Connected Layer 1, dropout
-            # w1 = tf.get_variable(name="d_w1",
-            #                      shape=[self._ndims, num_h1],
-            #                      dtype=tf.float32,
-            #                      initializer=layers.xavier_initializer(uniform=False))
+            # Fully Connected Layer 1, dropout
+            w1 = tf.get_variable(name="d_w1",
+                                 shape=[self._ndims, num_h1],
+                                 dtype=tf.float32,
+                                 initializer=layers.xavier_initializer(uniform=False))
 
-            # b1 = tf.get_variable(name="d_b1",
-            #                      shape=[num_h1],
-            #                      dtype=tf.float32,
-            #                      initializer=tf.zeros_initializer())
+            b1 = tf.get_variable(name="d_b1",
+                                 shape=[num_h1],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
 
-            # h1 = tf.nn.dropout(tf.nn.relu(tf.matmul(x, w1) + b1), keep_prob)
+            h1 = tf.nn.dropout(tf.nn.relu(tf.matmul(x, w1) + b1), keep_prob)
 
-            # # Fully Connected Layer 2 (200  -> 150 ) , dropout
+            # Fully Connected Layer 2 (200  -> 150 ) , dropout
+            w2 = tf.get_variable(name="d_w2",
+                                 shape=[num_h1, num_h2],
+                                 dtype=tf.float32,
+                                 initializer=layers.xavier_initializer(uniform=False))
 
-            # w2 = tf.get_variable(name="d_w2",
-            #                      shape=[num_h1, num_h2],
-            #                      dtype=tf.float32,
-            #                      initializer=layers.xavier_initializer(uniform=False))
+            b2 = tf.get_variable(name="d_b2",
+                                 shape=[num_h2],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
 
-            # b2 = tf.get_variable(name="d_b2",
-            #                      shape=[num_h2],
-            #                      dtype=tf.float32,
-            #                      initializer=tf.zeros_initializer())
+            h2 = tf.nn.dropout(tf.nn.relu(tf.matmul(h1, w2) + b2), keep_prob)
 
-            # h2 = tf.nn.dropout(tf.nn.relu(tf.matmul(h1, w2) + b2), keep_prob)
+            # Fully Connected Layer 3
+            w3 = tf.get_variable(name="d_w3",
+                                 shape=[num_h2, 1],
+                                 dtype=tf.float32,
+                                 initializer=layers.xavier_initializer(uniform=False))
 
-            # # Fully Connected Layer 3
+            b3 = tf.get_variable(name="d_b3",
+                                 shape=[1],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
 
-            # w3 = tf.get_variable(name="d_w3",
-            #                      shape=[num_h2, 1],
-            #                      dtype=tf.float32,
-            #                      initializer=layers.xavier_initializer(uniform=False))
-
-            # b3 = tf.get_variable(name="d_b3",
-            #                      shape=[1],
-            #                      dtype=tf.float32,
-            #                      initializer=tf.zeros_initializer())
-
-            # y = tf.matmul(h2, w3) + b3  # logits
+            y = tf.matmul(h2, w3) + b3  # logits
 
             # ---------------------------------------------------------------#
 
-            n_units = 392
-            alpha = 0.01
+            # n_units = 392
+            # alpha = 0.01
 
-            # Hidden layer
-            h1 = tf.layers.dense(x, n_units, activation=None)
-            # Leaky ReLU
-            h1 = tf.maximum(h1, alpha * h1)
+            # # Hidden layer
+            # h1 = tf.layers.dense(x, n_units, activation=None)
+            # # Leaky ReLU
+            # h1 = tf.maximum(h1, alpha * h1)
 
-            # logits
-            y = tf.layers.dense(h1, 1, activation=None)
+            # # logits
+            # y = tf.layers.dense(h1, 1, activation=None)
 
         return y
 
@@ -229,64 +227,61 @@ class Gan(object):
 
             # ---------------------------------------------------------------#
 
-            # h1_size = 196
-            # h2_size = 392
+            h1_size = 196
+            h2_size = 392
 
-            # # Fully Connected Layer 1
+            # Fully Connected Layer 1
+            w1 = tf.get_variable(name="g_w1",
+                                 shape=[self._nlatent, h1_size],
+                                 dtype=tf.float32,
+                                 initializer=layers.xavier_initializer(uniform=False))
 
-            # w1 = tf.get_variable(name="g_w1",
-            #                      shape=[self._nlatent, h1_size],
-            #                      dtype=tf.float32,
-            #                      initializer=layers.xavier_initializer(uniform=False))
+            b1 = tf.get_variable(name="g_b1",
+                                 shape=[h1_size],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
 
-            # b1 = tf.get_variable(name="g_b1",
-            #                      shape=[h1_size],
-            #                      dtype=tf.float32,
-            #                      initializer=tf.zeros_initializer())
+            h1 = tf.nn.relu(tf.matmul(z, w1) + b1)
 
-            # h1 = tf.nn.relu(tf.matmul(z, w1) + b1)
+            # Fully Connected Layer 2
+            w2 = tf.get_variable(name="g_w2",
+                                 shape=[h1_size, h2_size],
+                                 dtype=tf.float32,
+                                 initializer=layers.xavier_initializer(uniform=False))
 
-            # # Fully Connected Layer 2
+            b2 = tf.get_variable(name="g_b2",
+                                 shape=[h2_size],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
 
-            # w2 = tf.get_variable(name="g_w2",
-            #                      shape=[h1_size, h2_size],
-            #                      dtype=tf.float32,
-            #                      initializer=layers.xavier_initializer(uniform=False))
+            h2 = tf.nn.relu(tf.matmul(h1, w2) + b2)
 
-            # b2 = tf.get_variable(name="g_b2",
-            #                      shape=[h2_size],
-            #                      dtype=tf.float32,
-            #                      initializer=tf.zeros_initializer())
+            # Fully Connected Layer 3
+            w3 = tf.get_variable(name="g_w3",
+                                 shape=[h2_size, self._ndims],
+                                 dtype=tf.float32,
+                                 initializer=layers.xavier_initializer(uniform=False))
 
-            # h2 = tf.nn.relu(tf.matmul(h1, w2) + b2)
+            b3 = tf.get_variable(name="g_b3",
+                                 shape=[self._ndims],
+                                 dtype=tf.float32,
+                                 initializer=tf.zeros_initializer())
 
-            # # Fully Connected Layer 3
-
-            # w3 = tf.get_variable(name="g_w3",
-            #                      shape=[h2_size, self._ndims],
-            #                      dtype=tf.float32,
-            #                      initializer=layers.xavier_initializer(uniform=False))
-
-            # b3 = tf.get_variable(name="g_b3",
-            #                      shape=[self._ndims],
-            #                      dtype=tf.float32,
-            #                      initializer=tf.zeros_initializer())
-
-            # x_hat = tf.matmul(h2, w3) + b3
+            x_hat = tf.matmul(h2, w3) + b3
 
             # ---------------------------------------------------------------#
 
-            alpha = 0.01
-            n_units = 392
+            # alpha = 0.01
+            # n_units = 392
 
-            # Hidden layer
-            h1 = tf.layers.dense(z, n_units, activation=None)
+            # # Hidden layer
+            # h1 = tf.layers.dense(z, n_units, activation=None)
 
-            # Leaky ReLU
-            h1 = tf.maximum(h1, alpha * h1)
+            # # Leaky ReLU
+            # h1 = tf.maximum(h1, alpha * h1)
 
-            # Logits
-            x_hat = tf.layers.dense(h1, self._ndims, activation=None)
+            # # Logits
+            # x_hat = tf.layers.dense(h1, self._ndims, activation=None)
 
             return x_hat
 
