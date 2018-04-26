@@ -104,7 +104,7 @@ class Gan(object):
 
             # ---------------------------------------------------------------#
 
-            keep_prob = 0.85
+            keep_prob = 0.9
             num_h1 = 392
             num_h2 = 196
 
@@ -121,7 +121,7 @@ class Gan(object):
 
             h1 = tf.nn.dropout(tf.nn.relu(tf.matmul(x, w1) + b1), keep_prob)
 
-            # Fully Connected Layer 2 (200  -> 150 ) , dropout
+            # Fully Connected Layer 2, dropout
             w2 = tf.get_variable(name="d_w2",
                                  shape=[num_h1, num_h2],
                                  dtype=tf.float32,
