@@ -1,0 +1,113 @@
+\newcommand{\QLearnStudSolA}{
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$$Q^*(s, a) = \sum\limits_{s' \in S} P(s' | s, a) \bigg[ R(s,a,s') + \max \limits_{a' \in \mathcal{A}_{s'}}Q^*(s', a') \bigg]$$
+\vspace{0cm}
+}
+
+\newcommand{\QLearnStudSolB}{
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+\item Obtain a sample mini-batch $\mathcal{B} \subseteq \mathcal{D}$, which $\mathcal{D} = \{(s,a,r,s') \}$
+\item Compute target $$y_j = R(s,a,s') + \gamma \max\limits_{a' \in \mathcal{A}_s'} Q(s', a') \;\;\;\;\; \forall j \in \mathcal{B}$$
+\item Use stochastic (semi-)gradient descent to optimize:
+\begin{align*}
+	Q(s, a) &= (1 - \alpha)Q(s, a) + \alpha y_j\\
+    &= (1 - \alpha)Q(s, a) + \alpha (R(s,a,s') + \gamma \max\limits_{a' \in \mathcal{A}_s'} Q(s', a'))
+\end{align*}
+\end{itemize}
+
+\vspace{0cm}
+}
+
+\newcommand{\QLearnStudSolC}{
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\\
+Advantage of Epsilon greedy strategy is to explore (generate) more random samples rather than directly use the state space. (so it is more stochastic)
+\vspace{0cm}
+}
+
+\newcommand{\QLearnStudSolD}{
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+\item Q-learning updates are incremental and do not converge quickly, so multiple passes with the same data is beneficial, especially when there is low variance in immediate outcomes $(r, s')$ given the same state, action pair $(s, a)$.
+\item Better convergence behavior will be given when training function approximation. This is because the data is more like i.i.d. data assumed in most supervised learning convergence proofs.
+\end{itemize}
+
+\vspace{0cm}
+}
+
+\newcommand{\QLearnStudSolE}{
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%.   YOUR SOLUTION FOR PROBLEM A BELOW THIS COMMENT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\\
+According to the solution in (b), the equation will become to:
+\begin{align*}
+	Q(s, a) &= (1 - \alpha)Q(s, a) + \alpha (R(s,a,s') + \gamma \max\limits_{a' \in \mathcal{A}_s'} Q(s', a'))\\
+    &= 0.5 \times Q(s, a) + 0.5 \times (R(s,a,s') + 0.5  \times \max\limits_{a' \in \mathcal{A}_s'} Q(s', a'))
+\end{align*}
+
+\begin{itemize}
+\item Step 1. $Q(S_1, a_1) = 0.5 \times 0 + 0.5 \times (-10 + 0.5 \times 0) = -5$
+\item Step 2. $Q(S_1, a_2) = 0.5 \times 0 + 0.5 \times (-10 + 0.5 \times 0) = -5$
+\item Step 3. $Q(S_2, a_1) = 0.5 \times 0 + 0.5 \times (18.5 + 0.5 \times -5) = 8$
+\item Step 4. $Q(S_1, a_2) = 0.5 \times -5 + 0.5 \times (-10 + 0.5 \times 8) = -5.5$
+\end{itemize}
+
+
+\begin{center}       
+\begin{tabular}[t]{|c c c|}
+\hline
+$Q$ & $S_{1}$ & $S_{2}$  \\ \hline
+$a_{1}$&-5&.\\ \hline
+$a_{2}$&.& .\\ \hline
+\end{tabular}
+
+\hfill
+
+\begin{tabular}[t]{|c c c|}
+\hline
+$Q$ & $S_{1}$ & $S_{2}$  \\ \hline
+$a_{1}$&-5&.\\ \hline
+$a_{2}$&-5&.\\ \hline
+\end{tabular}
+
+\hfill
+
+\begin{tabular}[t]{|c c c|}
+\hline
+$Q$ & $S_{1}$ & $S_{2}$  \\ \hline
+$a_{1}$&-5&8\\ \hline
+$a_{2}$&-5&. \\ \hline
+\end{tabular}
+
+\hfill
+
+\begin{tabular}[t]{|c c c|}
+\hline
+$Q$ & $S_{1}$ & $S_{2}$  \\ \hline
+$a_{1}$&-5&8\\ \hline
+$a_{2}$&-5.5&. \\ \hline
+\end{tabular}
+\end{center}
+
+\vspace{0cm}
+}
