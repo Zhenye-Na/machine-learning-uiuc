@@ -42,7 +42,7 @@ Lr = 1e-6
 
 
 def weight_variable(shape):
-    """Initializa the weight variable."""
+    """Initialize the weight variable."""
     initial = tf.truncated_normal(shape, stddev=0.01)
     return tf.Variable(initial)
 
@@ -109,25 +109,30 @@ def get_action_index(readout_t, epsilon, t):
 
     Details:
         choose an action randomly:
-        (1) in the observation phase (t<OBSERVE).
+        (1) in the observation phase (t < OBSERVE).
         (2) beyond the observation phase with probability "epsilon".
         otherwise, choose the action with the highest Q-value.
     Args:
         readout_t: a vector with the Q-value associated with every action.
-        epsilon: tempreture variable for exploration-exploitation.
+        epsilon: temperature variable for exploration-exploitation.
         t: current number of iterations.
     Returns:
         index: the index of the action to be taken next.
     """
-    action_index = 0
-
-    return action_index
+    p = random.random()
+    if t < OBSERVE:
+        return random.randint(0, len(readout_t) - 1)
+    else:
+        if p >= epsilon:
+            return np.argmax(readout_t)
+        else:
+            return random.randint(0, len(readout_t) - 1)
 
 
 def scale_down_epsilon(epsilon, t):
     """Epsilon decrease.
 
-    Decrease epsilon after by ((INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE )
+    Decrease epsilon after by ((INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE)
     in case epsilon is larger than the desired final epsilon or beyond
     the observation phase.
     Args:
@@ -136,7 +141,8 @@ def scale_down_epsilon(epsilon, t):
     Returns:
         the updated epsilon
     """
-    pass
+    if (t > OBSERVE) and (epsilon > FINAL_EPSILON):
+        epsilon -= ((INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE)
     return epsilon
 
 
@@ -145,6 +151,7 @@ def run_selected_action(a_t, s_t, game_state):
 
     Do not forget that state is composed of the 4 previous frames.
     Hint: check the initialization for the interface to the game simulator.
+
     Args:
         a_t: current action.
         s_t: current state.
@@ -154,7 +161,11 @@ def run_selected_action(a_t, s_t, game_state):
         r_t: reward.
         terminal: indicating whether the episode terminated (output of the simulator).
     """
-    pass
+    x_t, r_t, terminal = game_state.frame_step(a_t)
+    x_t = cv2.cvtColor(cv2.resize(x_t, (80, 80)), cv2.COLOR_BGR2GRAY)
+    ret, x_t = cv2.threshold(x_t, 1, 255, cv2.THRESH_BINARY)
+    s_t1 = np.stack((s_t[:, :, 1], s_t[:, :, 2], s_t[:, :, 3], x_t), axis=2)
+
     return s_t1, r_t, terminal
 
 
@@ -197,8 +208,12 @@ def compute_target_q(r_batch, readout_j1_batch, terminal_batch):
 
     for i in range(0, len(terminal_batch)):
         # If the terminal state is reached, the Q-value is only equal to the reward.
+        if terminal_batch[i]:
+            target_q_batch.append(r_batch[i])
+        else:
+            target_q_batch.append(
+                r_batch[i] + GAMMA * readout_j1_batch[i].max())
 
-        pass
     return target_q_batch
 
 
@@ -281,7 +296,7 @@ def trainNetwork(s, readout, sess):
         if (t > OBSERVE):
 
             # Sample a minibatch to train on.
-            minibatch = random.sample(D, BATCH)
+            minibatch = random.sample(list(D), BATCH)
 
             # Get the batch variables.
             s_j_batch = [d[0] for d in minibatch]
