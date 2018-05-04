@@ -121,12 +121,14 @@ def get_action_index(readout_t, epsilon, t):
     """
     p = random.random()
     if t < OBSERVE:
-        return random.randint(0, len(readout_t) - 1)
+        action_index = random.randint(0, len(readout_t) - 1)
     else:
         if p >= epsilon:
-            return np.argmax(readout_t)
+            action_index = np.argmax(readout_t)
         else:
-            return random.randint(0, len(readout_t) - 1)
+            action_index = random.randint(0, len(readout_t) - 1)
+
+    return action_index
 
 
 def scale_down_epsilon(epsilon, t):
@@ -256,7 +258,7 @@ def trainNetwork(s, readout, sess):
     # Save and load model checkpoints.
     saver = tf.train.Saver()
     sess.run(tf.initialize_all_variables())
-    checkpoint = tf.train.get_checkpoint_state("saved_networks_q_learning")
+    checkpoint = tf.train.get_checkpoint_state("./saved_networks_q_learning/")
     if checkpoint and checkpoint.model_checkpoint_path:
         saver.restore(sess, checkpoint.model_checkpoint_path)
         print("Successfully loaded:", checkpoint.model_checkpoint_path)
