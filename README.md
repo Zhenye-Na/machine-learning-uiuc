@@ -1,4 +1,13 @@
 # [CS446 Machine Learning](https://courses.engr.illinois.edu/cs446/sp2018/_site/index.html)
+
+[Course Information](#course-information)  
+[Pre-requisites](#pre-requisites)  
+[Recommended Text](#recommended-text)  
+[Instructors](#instructors)  
+[Announcement](#announcement)
+
+
+
 ## Course Information:
 The goal of Machine Learning is to build computer systems that can adapt and learn from data. In this course we will cover three main areas: 
 
@@ -20,7 +29,7 @@ In particular we will cover the following:
 - Markov Decision Processes
 - Q-Learning
 
-## Pre-requisites: 
+## Prerequisites: 
 Probability, Linear Algebra, and proficiency in Python. 
 
 ## Recommended Text: 
@@ -33,7 +42,7 @@ Probability, Linear Algebra, and proficiency in Python.
 - Alexander Schwing, Website [[Link]](http://www.alexander-schwing.de/)
 - Matus Telgarsky, Website [[Link]](http://mjt.web.engr.illinois.edu/)
 
-## Announcement
+## Announcement:
 All copyrights reserved © CS446 Instructors & TAs
 
 * Raymond Yeh, Website [[Link]](http://www.isle.illinois.edu/~yeh17/)
