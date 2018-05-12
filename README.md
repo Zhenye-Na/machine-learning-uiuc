@@ -35,7 +35,6 @@ Probability, Linear Algebra, and proficiency in Python.
 
 ## Announcement
 All copyrights reserved © CS446 Instructors & TAs
-{: style="text-align: center"}
 
 * Raymond Yeh, Website [[Link]](http://www.isle.illinois.edu/~yeh17/)
 * Colin Graber
