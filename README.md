@@ -1,10 +1,12 @@
 # [CS446 Machine Learning](https://courses.engr.illinois.edu/cs446/sp2018/_site/index.html)
 
-[Course Information](#course-information)  
-[Pre-requisites](#pre-requisites)  
-[Recommended Text](#recommended-text)  
-[Instructors](#instructors)  
-[Announcement](#announcement)
+**Contents:**
+
+* [Course Information](#course-information)
+* [Pre-requisites](#pre-requisites)
+* [Recommended Text](#recommended-text)
+* [Instructors](#instructors)
+* [Announcement](#announcement)
 
 
 
@@ -29,7 +31,7 @@ In particular we will cover the following:
 - Markov Decision Processes
 - Q-Learning
 
-## Prerequisites: 
+## Pre-requisites: 
 Probability, Linear Algebra, and proficiency in Python. 
 
 ## Recommended Text: 
