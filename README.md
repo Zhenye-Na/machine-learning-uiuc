@@ -1,5 +1,10 @@
 # [CS446 Machine Learning](https://courses.engr.illinois.edu/cs446/sp2018/_site/index.html)
 
+[![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
+[![star this repo](http://githubbadges.com/star.svg?user=zhenye-na&repo=machine-learning-uiuc&style=flat)](https://github.com/zhenye-na/machine-learning-uiuc)
+[![fork this repo](http://githubbadges.com/fork.svg?user=zhenye-na&repo=machine-learning-uiuc&style=flat)](https://github.com/zhenye-na/machine-learning-uiuc/fork)
+[![HitCount](http://hits.dwyl.io/Zhenye-Na/machine-learning-uiuc.svg)](http://hits.dwyl.io/Zhenye-Na/machine-learning-uiuc)
+
 ## Table of Contents:
 
 * [Course Information](#course-information)
